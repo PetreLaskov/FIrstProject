@@ -1,0 +1,3128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e6ed;
+            min-height: 100vh;
+            padding: 20px 20px 100px 20px; /* Added bottom padding for stats bar */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+
+        .goal-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .goal-section h2 {
+            color: #a78bfa;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .goal-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #e0e6ed;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .goal-input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+        }
+
+        .goal-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .focus-mode-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .main-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .custom-timer-section {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .timer-presets {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            color: #9ca3af;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .preset-btn:hover {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: #a78bfa;
+            color: #e0e6ed;
+        }
+
+        .preset-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .custom-timer-input {
+            width: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 6px;
+            padding: 6px 8px;
+            color: #e0e6ed;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .custom-timer-input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            background: rgba(167, 139, 250, 0.1);
+        }
+
+        .custom-timer-input::placeholder {
+            color: #6b7280;
+        }
+
+        .timer-label {
+            color: #9ca3af;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .focus-mode-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
+        }
+
+        .focus-mode-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .focus-sessions {
+            margin-top: 0.5rem;
+            color: #a78bfa;
+            font-size: 0.9rem;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .column {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-height: 400px;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .column-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #a78bfa;
+        }
+
+        .task-count {
+            background: rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .task {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            user-select: none;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .task:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.12) 100%);
+            border-color: rgba(167, 139, 250, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .task.dragging {
+            transform: rotate(5deg) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .task.stale {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+        }
+
+        .task.editing {
+            background: rgba(167, 139, 250, 0.1);
+            border-color: #a78bfa;
+        }
+
+        .task-edit-input {
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-size: inherit;
+            font-family: inherit;
+            width: 100%;
+            outline: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .focus-task.pulse {
+            animation: focusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes focusPulse {
+            0%, 100% { 
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(167, 139, 250, 0.7);
+            }
+            50% { 
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 0 0 0 10px rgba(167, 139, 250, 0);
+            }
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-type-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #a78bfa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .task-text {
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+            color: #f9fafb;
+            font-weight: 500;
+        }
+
+        .task-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .task-focus-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0;
+        }
+
+        .task:hover .task-focus-btn {
+            opacity: 1;
+        }
+
+        .task-focus-btn:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+            transform: scale(1.05);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .task:hover .task-actions {
+            opacity: 1;
+        }
+
+        .task-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .move-btn {
+            background: rgba(167, 139, 250, 0.2);
+            color: #a78bfa;
+        }
+
+        .move-btn:hover {
+            background: rgba(167, 139, 250, 0.3);
+        }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .add-task-section {
+            text-align: center;
+        }
+
+        .add-task-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .add-task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.3);
+        }
+
+        .task-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #e0e6ed;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-input:focus {
+            outline: none;
+            border-color: #a78bfa;
+        }
+
+        .task-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .impact-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        .impact-label {
+            font-size: 0.8rem;
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            font-size: 1.2rem;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+
+        .task-impact {
+            display: flex;
+            gap: 1px;
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        .task-impact .star {
+            font-size: 0.8rem;
+            cursor: default;
+            transform: none;
+        }
+
+        .task-impact .star.filled {
+            color: #fbbf24;
+        }
+
+        .task-impact .star.empty {
+            color: #374151;
+        }
+
+        /* Impact-based borders */
+        .task.impact-5 {
+            border: 2px solid #fbbf24;
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+        }
+
+        .task.impact-4 {
+            border: 2px solid #9ca3af;
+            box-shadow: 0 0 8px rgba(156, 163, 175, 0.3);
+        }
+
+        .task.impact-3 {
+            border: 2px solid #cd7c0f;
+            box-shadow: 0 0 8px rgba(205, 124, 15, 0.3);
+        }
+
+        .reminder-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(251, 191, 36, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            border-radius: 12px;
+            padding: 1.5rem;
+            z-index: 1500;
+            color: #92400e;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+            animation: fadeInScale 0.3s ease;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .reminder-popup h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .reminder-popup p {
+            margin: 0 0 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .reminder-popup button {
+            background: rgba(146, 64, 14, 0.2);
+            border: 1px solid rgba(146, 64, 14, 0.3);
+            color: #92400e;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .reminder-popup button:hover {
+            background: rgba(146, 64, 14, 0.3);
+        }
+
+        .quick-win-btn {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #92400e;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-left: 10px;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+        }
+
+        .quick-win-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+        }
+
+        .task.quick-win {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            border: 2px solid #fbbf24;
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+            color: #e5e7eb;
+        }
+
+        .task.quick-win .task-text {
+            color: #f9fafb;
+            font-weight: 600;
+        }
+
+        .quick-win-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            color: #fbbf24;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .quick-win-timer {
+            background: rgba(251, 191, 36, 0.4);
+            border: 2px solid #fbbf24;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+        }
+
+        .timer-display {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #1f2937;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .timer-display.warning {
+            color: #dc2626;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .timer-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(146, 64, 14, 0.4);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(146, 64, 14, 0.6);
+        }
+
+        .timer-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            border-radius: 2px;
+            transition: width 1s linear;
+        }
+
+        .timer-progress-bar.warning {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .timer-btn {
+            padding: 8px 16px;
+            border: 1px solid;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .timer-btn.start {
+            background: #10b981;
+            border-color: #059669;
+            color: white;
+        }
+
+        .timer-btn.start:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+        }
+
+        .timer-btn.pause {
+            background: #f59e0b;
+            border-color: #d97706;
+            color: white;
+        }
+
+        .timer-btn.pause:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        }
+
+        .timer-btn.reset {
+            background: #6b7280;
+            border-color: #4b5563;
+            color: white;
+        }
+
+        .timer-btn.reset:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);
+        }
+
+        .auto-save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.3s ease;
+        }
+
+        .auto-save-indicator.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #fbbf24;
+            pointer-events: none;
+            z-index: 3000;
+        }
+
+        .confetti.red { background: #ef4444; }
+        .confetti.blue { background: #3b82f6; }
+        .confetti.green { background: #10b981; }
+        .confetti.purple { background: #a78bfa; }
+        .confetti.yellow { background: #fbbf24; }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .keyboard-hint {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .keyboard-hint.show {
+            opacity: 1;
+        }
+
+        .momentum-celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid #fbbf24;
+            border-radius: 20px;
+            padding: 2rem;
+            z-index: 1500;
+            color: #92400e;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(251, 191, 36, 0.4);
+            animation: celebrationBounce 0.6s ease;
+            max-width: 400px;
+        }
+
+        @keyframes celebrationBounce {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .momentum-celebration h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .momentum-celebration p {
+            margin: 0 0 1.5rem 0;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        .momentum-celebration button {
+            background: rgba(146, 64, 14, 0.2);
+            border: 2px solid #92400e;
+            color: #92400e;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .momentum-celebration button:hover {
+            background: rgba(146, 64, 14, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .stats-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            z-index: 100;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .stats-bar:hover {
+            background: rgba(26, 26, 46, 0.98);
+            transform: translateY(-2px);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .stat-value.green {
+            color: #10b981;
+        }
+
+        .stat-value.yellow {
+            color: #fbbf24;
+        }
+
+        .stat-value.red {
+            color: #ef4444;
+        }
+
+        .stat-value.blue {
+            color: #3b82f6;
+        }
+
+        .stat-value.purple {
+            color: #a78bfa;
+        }
+
+        @keyframes statBounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .stat-value.animate {
+            animation: statBounce 0.4s ease;
+        }
+
+        .stats-graph-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .stats-graph-content {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .stats-graph-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stats-graph-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #a78bfa;
+            margin: 0;
+        }
+
+        .close-stats {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #9ca3af;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .close-stats:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #e0e6ed;
+        }
+
+        .graph-container {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            height: 200px;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .graph-bar {
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+            width: 60px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .graph-bar:hover {
+            background: linear-gradient(to top, #a78bfa, #8b5cf6);
+            transform: scaleY(1.05);
+        }
+
+        .graph-bar-label {
+            position: absolute;
+            bottom: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #9ca3af;
+            text-align: center;
+        }
+
+        .graph-bar-value {
+            position: absolute;
+            top: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #e0e6ed;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px 10px 80px 10px; /* Smaller bottom padding on mobile */
+            }
+            
+            .stats-bar {
+                gap: 1rem;
+                padding: 0.5rem;
+            }
+            
+            .stat-item {
+                gap: 0.125rem;
+            }
+            
+            .stat-label {
+                font-size: 0.6rem;
+            }
+            
+            .stat-value {
+                font-size: 1rem;
+            }
+            
+            .graph-bar {
+                width: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px 10px 80px 10px;
+            }
+            
+            .column {
+                padding: 1rem;
+            }
+        }
+
+        .daily-reset-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .daily-reset-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            color: #1a1a2e;
+        }
+
+        .daily-reset-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .daily-reset-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .win-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            color: #1a1a2e;
+            transition: all 0.3s ease;
+        }
+
+        .win-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .win-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .start-day-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .start-day-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .start-day-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .yesterday-summary {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: #065f46;
+        }
+
+        .daily-quote {
+            font-style: italic;
+            color: #6b7280;
+            font-size: 1rem;
+            line-height: 1.6;
+            border-top: 1px solid rgba(107, 114, 128, 0.2);
+            padding-top: 1.5rem;
+        }
+
+        .quote-author {
+            font-weight: 600;
+            margin-top: 0.5rem;
+            color: #4b5563;
+        }
+
+        @media (max-width: 768px) {
+            .daily-reset-content {
+                padding: 2rem;
+                margin: 10px;
+            }
+            
+            .daily-reset-title {
+                font-size: 2rem;
+            }
+            
+            .daily-reset-subtitle {
+                font-size: 1.1rem;
+            }
+        }
+
+        .doing-limit {
+            color: #f59e0b;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .focus-mode-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .focus-mode-content {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .focus-task {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(167, 139, 250, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .focus-task-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #e0e6ed;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .focus-timer {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .focus-progress-container {
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .focus-progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .focus-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #fbbf24 100%);
+            border-radius: 6px;
+            transition: width 1s linear;
+            position: relative;
+        }
+
+        .focus-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .focus-progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            font-family: 'Courier New', monospace;
+        }
+
+        .focus-halfway {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+
+        .focus-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .focus-control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            color: #e0e6ed;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .focus-control-btn:hover {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: #a78bfa;
+        }
+
+        .focus-control-btn.primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: #10b981;
+        }
+
+        .focus-control-btn.primary:hover {
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .exit-focus-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #9ca3af;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .exit-focus-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #e0e6ed;
+        }
+
+        .focus-completion {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .focus-completion h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .focus-completion p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .board {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .focus-timer {
+                font-size: 3rem;
+            }
+            
+            .focus-task-text {
+                font-size: 1.4rem;
+            }
+            
+            .focus-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .focus-control-btn {
+                width: 200px;
+            }
+        }
+
+        /* Drag and Drop Styles */
+        .task-item {
+            cursor: grab;
+        }
+        
+        .task-item:active {
+            cursor: grabbing;
+        }
+        
+        .task-item[draggable="true"] {
+            transition: all 0.3s ease;
+        }
+        
+        .task-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+        
+        .column.drag-active {
+            border-color: rgba(167, 139, 250, 0.5);
+            background: rgba(167, 139, 250, 0.05);
+        }
+        
+        .column.drag-over {
+            border-color: #a78bfa;
+            background: rgba(167, 139, 250, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .archive-drop-zone {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px dashed rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            color: #dc2626;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        .archive-drop-zone.visible {
+            opacity: 1;
+            visibility: visible;
+            height: auto;
+            padding: 1.5rem;
+        }
+        
+        .archive-drop-zone.drag-over {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .archive-drop-zone::before {
+            content: "🗂️";
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Focus Flow</h1>
+        
+        <div class="goal-section">
+            <h2>Today's Main Goal</h2>
+            <input type="text" id="mainGoal" class="goal-input" placeholder="What's your main focus for today?">
+        </div>
+
+        <div class="focus-mode-section">
+            <div class="main-controls">
+                <button class="add-task-btn" id="addTaskBtn">+ Add New Task</button>
+                <button class="focus-mode-btn" id="focusModeBtn">
+                    🎯 Enter Focus Mode
+                </button>
+                <button class="quick-win-btn" id="quickWinBtn">⚡ Quick Win</button>
+            </div>
+            
+            <div class="custom-timer-section">
+                <div class="timer-presets">
+                    <button class="preset-btn active" data-minutes="50">50 min</button>
+                    <button class="preset-btn" data-minutes="25">25 min</button>
+                    <button class="preset-btn" data-minutes="90">90 min</button>
+                    <input type="number" id="customMinutes" class="custom-timer-input" placeholder="Custom" min="1" max="240">
+                    <span class="timer-label">minutes</span>
+                </div>
+            </div>
+            
+            <div class="focus-sessions" id="focusSessions">Focus sessions completed today: 0</div>
+        </div>
+
+        <div class="board">
+            <div class="column" data-column="todo">
+                <div class="column-header">
+                    <div class="column-title">To Do</div>
+                    <div class="task-count" id="todoCount">0</div>
+                </div>
+                <div class="task-list" id="todoList"></div>
+                <div id="taskForm" style="display: none;">
+                    <input type="text" id="todoInput" class="task-input" placeholder="Add new task...">
+                    <div class="impact-rating" id="impactRating">
+                        <span class="impact-label">Impact:</span>
+                        <div class="star-rating" id="starRating">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                    </div>
+                    <div id="quickWinNote" style="display: none; background: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 6px; padding: 0.5rem; margin-top: 0.5rem; color: #92400e; font-size: 0.8rem; font-weight: 500;">
+                        ⚡ Quick Win: Keep it to 15 minutes or less!
+                    </div>
+                </div>
+            </div>
+
+            <div class="column" data-column="doing">
+                <div class="column-header">
+                    <div class="column-title">Doing</div>
+                    <div class="task-count" id="doingCount">0/3</div>
+                </div>
+                <div class="task-list" id="doingList"></div>
+                <div class="doing-limit">Maximum 3 tasks in progress</div>
+            </div>
+
+            <div class="column" data-column="done">
+                <div class="column-header">
+                    <div class="column-title">Done</div>
+                    <div class="task-count" id="doneCount">0</div>
+                </div>
+                <div class="task-list" id="doneList"></div>
+            </div>
+        </div>
+
+        <!-- Archive Drop Zone -->
+        <div class="archive-drop-zone" id="archiveDropZone">
+            <div>Drop tasks here to archive</div>
+        </div>
+
+        <div class="add-task-section">
+            <button class="add-task-btn" id="archiveBtn" style="background: rgba(156, 163, 175, 0.2); color: #9ca3af;">📁 Archive</button>
+        </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar" id="statsBar" onclick="app.showStatsGraph()">
+        <div class="stat-item">
+            <div class="stat-label">Today</div>
+            <div class="stat-value" id="todayCount">0</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">This Week</div>
+            <div class="stat-value blue" id="weekCount">0</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Focus Sessions</div>
+            <div class="stat-value purple" id="focusCount">0</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Streak</div>
+            <div class="stat-value" id="streakCount">0</div>
+        </div>
+    </div>
+
+    <!-- Stats Graph Overlay -->
+    <div class="stats-graph-overlay" id="statsGraphOverlay">
+        <div class="stats-graph-content">
+            <div class="stats-graph-header">
+                <h3 class="stats-graph-title">📈 7-Day Progress</h3>
+                <button class="close-stats" id="closeStats">×</button>
+            </div>
+            <div class="graph-container" id="graphContainer">
+                <!-- Graph bars will be generated here -->
+            </div>
+            <div style="text-align: center; color: #9ca3af; font-size: 0.9rem;">
+                Click the stats bar anytime to view your progress!
+            </div>
+        </div>
+    </div>
+
+    <!-- Focus Mode Overlay -->
+    <div class="focus-mode-overlay" id="focusModeOverlay">
+        <div class="focus-mode-content">
+            <div class="focus-task" id="focusTask">
+                <div class="focus-task-text" id="focusTaskText">No tasks in progress</div>
+            </div>
+            
+            <div class="focus-timer" id="focusTimer">50:00</div>
+            
+            <div class="focus-progress-container">
+                <div class="focus-progress-bar">
+                    <div class="focus-progress-fill" id="focusProgressFill"></div>
+                </div>
+                <div class="focus-progress-labels">
+                    <span>0:00</span>
+                    <span class="focus-halfway">25:00</span>
+                    <span>50:00</span>
+                </div>
+            </div>
+            
+            <div class="focus-controls">
+                <button class="focus-control-btn primary" id="startTimerBtn">Start</button>
+                <button class="focus-control-btn" id="pauseTimerBtn">Pause</button>
+                <button class="focus-control-btn" id="completeTaskBtn">End Focus Session</button>
+            </div>
+            
+            <div class="focus-completion hidden" id="focusCompletion">
+                <h3>🎉 Great work!</h3>
+                <p>Take a 10-minute break. You've earned it!</p>
+                <button class="focus-control-btn" id="startBreakBtn">Start Break</button>
+            </div>
+            
+            <button class="exit-focus-btn" id="exitFocusBtn">← Exit Focus Mode</button>
+        </div>
+    </div>
+
+    <!-- Daily Reset Overlay -->
+    <div class="daily-reset-overlay" id="dailyResetOverlay">
+        <div class="daily-reset-content">
+            <div class="daily-reset-title">🌅 New Day, New Focus</div>
+            <div class="daily-reset-subtitle">What's the ONE thing that would make today a win?</div>
+            
+            <div id="yesterdaySummary" class="yesterday-summary" style="display: none;">
+                <strong>🎆 Yesterday's Progress:</strong>
+                <div id="yesterdayCount"></div>
+            </div>
+            
+            <input type="text" id="winGoalInput" class="win-input" placeholder="Enter your main goal for today..." maxlength="100">
+            
+            <button id="startDayBtn" class="start-day-btn" disabled>Start My Day</button>
+            
+            <div class="daily-quote">
+                <div id="dailyQuoteText"></div>
+                <div class="quote-author" id="dailyQuoteAuthor"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archive Modal -->
+    <div id="archiveModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; padding: 20px; overflow-y: auto;">
+        <div style="background: rgba(26, 26, 46, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; max-width: 800px; margin: 50px auto; padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                <h2 style="color: #a78bfa; font-size: 1.5rem; margin: 0;">📁 Task Archive</h2>
+                <button id="closeArchive" style="background: rgba(255, 255, 255, 0.1); border: none; color: #9ca3af; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 1.2rem;">×</button>
+            </div>
+            <div id="archiveContent"></div>
+        </div>
+    </div>
+
+    <script>
+        class FocusFlow {
+            constructor() {
+                this.tasks = {
+                    todo: [],
+                    doing: [],
+                    done: []
+                };
+                this.mainGoal = '';
+                this.focusSessions = 0;
+                this.lastActiveDate = null;
+                this.quickWinsToday = 0;
+                this.isCreatingQuickWin = false;
+                this.dailyStats = {}; // { 'YYYY-MM-DD': completedCount }
+                this.currentStreak = 0;
+                this.quickWinTimers = {}; // { taskId: { timeLeft, interval, running } }
+                this.setupKeyboardShortcuts();
+                this.quotes = [
+                    { text: "The successful warrior is the average person with laser-like focus.", author: "Bruce Lee" },
+                    { text: "Concentrate all your thoughts upon the work at hand. The sun's rays do not burn until brought to a focus.", author: "Alexander Graham Bell" },
+                    { text: "Focus is a matter of deciding what things you're not going to do.", author: "John Carmack" },
+                    { text: "The art of being wise is knowing what to overlook.", author: "William James" },
+                    { text: "It is during our darkest moments that we must focus to see the light.", author: "Aristotle" },
+                    { text: "Where focus goes, energy flows and results show.", author: "Tony Robbins" },
+                    { text: "The main thing is to keep the main thing the main thing.", author: "Stephen Covey" },
+                    { text: "Lack of direction, not lack of time, is the problem. We all have twenty-four hour days.", author: "Zig Ziglar" }
+                ];
+                this.focusMode = {
+                    active: false,
+                    timeLeft: 50 * 60, // 50 minutes in seconds
+                    running: false,
+                    currentTask: null,
+                    timer: null,
+                    halfwayChimed: false,
+                    customDuration: 50 // Default duration in minutes
+                };
+                this.init();
+            }
+
+            init() {
+                this.loadFromStorage();
+                this.checkForNewDay();
+                this.setupEventListeners();
+                this.setupDragAndDrop();
+                this.render();
+            }
+
+            setupEventListeners() {
+                const mainGoalInput = document.getElementById('mainGoal');
+                const addTaskBtn = document.getElementById('addTaskBtn');
+                const todoInput = document.getElementById('todoInput');
+                const focusModeBtn = document.getElementById('focusModeBtn');
+                const exitFocusBtn = document.getElementById('exitFocusBtn');
+                const startTimerBtn = document.getElementById('startTimerBtn');
+                const pauseTimerBtn = document.getElementById('pauseTimerBtn');
+                const completeTaskBtn = document.getElementById('completeTaskBtn');
+                const startBreakBtn = document.getElementById('startBreakBtn');
+
+                mainGoalInput.addEventListener('input', (e) => {
+                    this.mainGoal = e.target.value;
+                    this.saveToStorage();
+                });
+
+                addTaskBtn.addEventListener('click', () => {
+                    this.showAddTaskInput(false);
+                });
+                
+                const quickWinBtn = document.getElementById('quickWinBtn');
+                quickWinBtn.addEventListener('click', () => {
+                    this.showAddTaskInput(true);
+                });
+
+                todoInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.addTask(e.target.value.trim());
+                        e.target.value = '';
+                        document.getElementById('taskForm').style.display = 'none';
+                    }
+                });
+
+                todoInput.addEventListener('blur', () => {
+                    // Small delay to allow star clicking
+                    setTimeout(() => {
+                        if (!document.querySelector('.star-rating:hover')) {
+                            document.getElementById('taskForm').style.display = 'none';
+                        }
+                    }, 150);
+                });
+
+                focusModeBtn.addEventListener('click', () => {
+                    this.enterFocusMode();
+                });
+
+                exitFocusBtn.addEventListener('click', () => {
+                    this.exitFocusMode();
+                });
+
+                startTimerBtn.addEventListener('click', () => {
+                    this.startFocusTimer();
+                });
+
+                pauseTimerBtn.addEventListener('click', () => {
+                    this.pauseFocusTimer();
+                });
+
+                completeTaskBtn.addEventListener('click', () => {
+                    this.completeCurrentTask();
+                });
+
+                startBreakBtn.addEventListener('click', () => {
+                    this.startBreak();
+                });
+
+                // Archive functionality
+                const archiveBtn = document.getElementById('archiveBtn');
+                const closeArchive = document.getElementById('closeArchive');
+                
+                archiveBtn.addEventListener('click', () => {
+                    this.showArchive();
+                });
+                
+                closeArchive.addEventListener('click', () => {
+                    this.hideArchive();
+                });
+                
+                // Stats graph functionality
+                const closeStats = document.getElementById('closeStats');
+                closeStats.addEventListener('click', () => {
+                    this.hideStatsGraph();
+                });
+                
+                // Show keyboard hints briefly on load
+                this.showKeyboardHints();
+                
+                // Daily reset functionality
+                const winGoalInput = document.getElementById('winGoalInput');
+                const startDayBtn = document.getElementById('startDayBtn');
+                
+                winGoalInput.addEventListener('input', () => {
+                    startDayBtn.disabled = !winGoalInput.value.trim();
+                });
+                
+                startDayBtn.addEventListener('click', () => {
+                    this.completeDailyReset();
+                });
+
+                // Timer preset event listeners
+                const presetButtons = document.querySelectorAll('.preset-btn');
+                const customMinutesInput = document.getElementById('customMinutes');
+
+                presetButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        // Remove active class from all buttons
+                        presetButtons.forEach(b => b.classList.remove('active'));
+                        // Add active class to clicked button
+                        btn.classList.add('active');
+                        // Clear custom input
+                        customMinutesInput.value = '';
+                        // Set custom duration
+                        this.focusMode.customDuration = parseInt(btn.dataset.minutes);
+                    });
+                });
+
+                customMinutesInput.addEventListener('input', () => {
+                    // Remove active class from preset buttons
+                    presetButtons.forEach(b => b.classList.remove('active'));
+                    // Set custom duration
+                    const value = parseInt(customMinutesInput.value);
+                    if (value && value > 0) {
+                        this.focusMode.customDuration = value;
+                    }
+                });
+            }
+
+            showAddTaskInput(isQuickWin = false) {
+                const taskForm = document.getElementById('taskForm');
+                const todoInput = document.getElementById('todoInput');
+                const impactRating = document.getElementById('impactRating');
+                const quickWinNote = document.getElementById('quickWinNote');
+                
+                this.isCreatingQuickWin = isQuickWin;
+                
+                if (isQuickWin) {
+                    todoInput.placeholder = 'Quick win task (15 min or less)...';
+                    impactRating.style.display = 'none';
+                    quickWinNote.style.display = 'block';
+                } else {
+                    todoInput.placeholder = 'Add new task...';
+                    impactRating.style.display = 'flex';
+                    quickWinNote.style.display = 'none';
+                    this.setupStarRating();
+                }
+                
+                taskForm.style.display = 'block';
+                todoInput.focus();
+            }
+
+            setupStarRating() {
+                const stars = document.querySelectorAll('.star-rating .star');
+                let selectedRating = 3; // Default to 3 stars
+                
+                // Set default rating
+                this.updateStarDisplay(selectedRating);
+                
+                stars.forEach(star => {
+                    star.addEventListener('click', () => {
+                        selectedRating = parseInt(star.dataset.rating);
+                        this.updateStarDisplay(selectedRating);
+                        this.currentTaskRating = selectedRating;
+                    });
+                    
+                    star.addEventListener('mouseenter', () => {
+                        const hoverRating = parseInt(star.dataset.rating);
+                        this.updateStarDisplay(hoverRating);
+                    });
+                });
+                
+                document.getElementById('starRating').addEventListener('mouseleave', () => {
+                    this.updateStarDisplay(selectedRating);
+                });
+                
+                this.currentTaskRating = selectedRating;
+            }
+            
+            updateStarDisplay(rating) {
+                const stars = document.querySelectorAll('.star-rating .star');
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
+            }
+
+            addTask(text) {
+                if (!text) return;
+                
+                const task = {
+                    id: Date.now(),
+                    text: text,
+                    createdAt: new Date().toISOString(),
+                    impact: this.isCreatingQuickWin ? 3 : (this.currentTaskRating || 3),
+                    isQuickWin: this.isCreatingQuickWin,
+                    movedToDoingAt: null
+                };
+                
+                this.tasks.todo.push(task);
+                this.saveToStorage();
+                this.render();
+                
+                // Reset form
+                this.currentTaskRating = 3;
+                this.isCreatingQuickWin = false;
+            }
+
+            moveTask(taskId, fromColumn, toColumn) {
+                const taskIndex = this.tasks[fromColumn].findIndex(task => task.id === taskId);
+                if (taskIndex === -1) return;
+
+                const task = this.tasks[fromColumn][taskIndex];
+                const isQuickWin = task && task.isQuickWin;
+                
+                // Check doing limit only for non-quick-win tasks
+                if (toColumn === 'doing' && !isQuickWin) {
+                    const regularTasksInDoing = this.tasks.doing.filter(t => !t.isQuickWin).length;
+                    if (regularTasksInDoing >= 3) {
+                        alert('Maximum 3 regular tasks allowed in "Doing" column');
+                        return;
+                    }
+                }
+
+                // Remove task from source column
+                this.tasks[fromColumn].splice(taskIndex, 1);
+                
+                // Show gentle reminder for low-impact tasks when high-impact ones exist
+                if (toColumn === 'doing' && fromColumn === 'todo' && (task.impact || 3) <= 2) {
+                    const highImpactTasks = this.tasks.todo.filter(t => (t.impact || 3) >= 4);
+                    if (highImpactTasks.length > 0) {
+                        this.showImpactReminder();
+                        // Continue with the move - don't block it!
+                    }
+                }
+                
+                // Track when task moves to doing
+                if (toColumn === 'doing') {
+                    task.movedToDoingAt = new Date().toISOString();
+                } else if (fromColumn === 'doing') {
+                    task.movedToDoingAt = null;
+                }
+                
+                // Always proceed with the move
+                this.tasks[toColumn].push(task);
+                
+                // Show confetti for task completion
+                if (toColumn === 'done') {
+                    this.showConfetti();
+                }
+                
+                // Handle quick win timer logic
+                if (task.isQuickWin) {
+                    if (toColumn === 'doing') {
+                        // Start timer when moving to doing
+                        this.startQuickWinTimer(task.id);
+                    } else {
+                        // Stop timer when moving away from doing
+                        this.stopQuickWinTimer(task.id);
+                    }
+                }
+                
+                // Check for task completion
+                if (toColumn === 'done') {
+                    if (task.isQuickWin) {
+                        this.quickWinsToday++;
+                        if (this.quickWinsToday === 3) {
+                            this.showMomentumCelebration();
+                        }
+                    }
+                    
+                    // Update daily stats
+                    const today = new Date().toDateString();
+                    this.dailyStats[today] = (this.dailyStats[today] || 0) + 1;
+                    this.updateStreak();
+                }
+                
+                this.saveToStorage();
+                this.render();
+            }
+            
+            showImpactReminder() {
+                const popup = document.createElement('div');
+                popup.className = 'reminder-popup';
+                popup.innerHTML = `
+                    <h3>⭐ Higher impact tasks are waiting!</h3>
+                    <p>Consider tackling your 4-5 star tasks first for maximum impact.</p>
+                    <button onclick="this.parentElement.remove()">Got it!</button>
+                `;
+                
+                document.body.appendChild(popup);
+                
+                // Auto-remove after 4 seconds
+                setTimeout(() => {
+                    if (popup.parentElement) {
+                        popup.remove();
+                    }
+                }, 4000);
+            }
+
+            deleteTask(taskId, column) {
+                const task = this.tasks[column].find(t => t.id === taskId);
+                if (task && task.isQuickWin) {
+                    this.stopQuickWinTimer(taskId);
+                }
+                
+                this.tasks[column] = this.tasks[column].filter(task => task.id !== taskId);
+                this.saveToStorage();
+                this.render();
+            }
+
+            renderTask(task, column) {
+                const taskDiv = document.createElement('div');
+                const impact = task.impact || 3;
+                const isQuickWin = task.isQuickWin;
+                const isStale = this.isTaskStale(task, column);
+                
+                taskDiv.className = `task task-item ${isQuickWin ? 'quick-win' : `impact-${impact}`} ${isStale ? 'stale' : ''}`;
+                taskDiv.setAttribute('data-task-id', task.id);
+                taskDiv.setAttribute('draggable', 'true');
+                
+                const actions = this.getTaskActions(task.id, column);
+                const typeIndicator = isQuickWin ? 
+                    '<div class="quick-win-indicator">⚡ Quick Win</div>' : 
+                    '<div class="task-type-indicator">📋 Task</div>';
+                
+                const impactDisplay = isQuickWin ? '' : `<div class="task-impact">${this.renderStars(impact)}</div>`;
+                
+                // Add timer for quick wins in doing column
+                const timer = (isQuickWin && column === 'doing') ? this.renderQuickWinTimer(task.id) : '';
+                
+                // Focus button only for "doing" tasks
+                const focusButton = (column === 'doing') ? 
+                    `<button class="task-focus-btn" onclick="app.startFocusFromTask(${task.id})">🎯 Focus</button>` : '';
+                
+                taskDiv.innerHTML = `
+                    <div class="task-header">
+                        ${typeIndicator}
+                        ${impactDisplay}
+                    </div>
+                    <div class="task-text" ondblclick="app.editTaskText(${task.id})">${task.text}</div>
+                    ${timer}
+                    <div class="task-footer">
+                        <div class="task-actions">
+                            ${actions}
+                            <button class="task-btn delete-btn" onclick="app.deleteTask(${task.id}, '${column}')">Delete</button>
+                        </div>
+                        ${focusButton}
+                    </div>
+                `;
+                
+                // Add drag effects
+                taskDiv.addEventListener('mousedown', () => {
+                    taskDiv.classList.add('dragging');
+                });
+                
+                taskDiv.addEventListener('mouseup', () => {
+                    taskDiv.classList.remove('dragging');
+                });
+                
+                return taskDiv;
+            }
+            
+            renderStars(impact) {
+                let stars = '';
+                for (let i = 1; i <= 5; i++) {
+                    const className = i <= impact ? 'star filled' : 'star empty';
+                    stars += `<span class="${className}">★</span>`;
+                }
+                return stars;
+            }
+
+            getTaskActions(taskId, column) {
+                switch (column) {
+                    case 'todo':
+                        return `<button class="task-btn move-btn" onclick="app.moveTask(${taskId}, 'todo', 'doing')">Start</button>`;
+                    case 'doing':
+                        return `
+                            <button class="task-btn move-btn" onclick="app.moveTask(${taskId}, 'doing', 'todo')">Back</button>
+                            <button class="task-btn move-btn" onclick="app.moveTask(${taskId}, 'doing', 'done')">Done</button>
+                        `;
+                    case 'done':
+                        return `
+                            <button class="task-btn move-btn" onclick="app.moveTask(${taskId}, 'done', 'todo')">Redo</button>
+                            <button class="task-btn" style="background: rgba(156, 163, 175, 0.2); color: #9ca3af;" onclick="app.archiveTask(${taskId})">📁</button>
+                        `;
+                    default:
+                        return '';
+                }
+            }
+
+            render() {
+                // Update main goal
+                document.getElementById('mainGoal').value = this.mainGoal;
+
+                // Update focus sessions counter
+                document.getElementById('focusSessions').textContent = `Focus sessions completed today: ${this.focusSessions}`;
+                
+                // Update stats bar
+                this.updateStatsBar();
+
+                // Update task lists
+                ['todo', 'doing', 'done'].forEach(column => {
+                    const list = document.getElementById(`${column}List`);
+                    const count = document.getElementById(`${column}Count`);
+                    
+                    list.innerHTML = '';
+                    
+                    // Sort todo by impact (highest first)
+                    let tasks = [...this.tasks[column]];
+                    if (column === 'todo') {
+                        tasks.sort((a, b) => (b.impact || 3) - (a.impact || 3));
+                    }
+                    
+                    tasks.forEach(task => {
+                        list.appendChild(this.renderTask(task, column));
+                    });
+
+                    // Update counts
+                    if (column === 'doing') {
+                        count.textContent = `${this.tasks[column].length}/3`;
+                    } else {
+                        count.textContent = this.tasks[column].length;
+                    }
+                });
+            }
+
+            saveToStorage() {
+                const data = {
+                    tasks: this.tasks,
+                    mainGoal: this.mainGoal,
+                    focusSessions: this.focusSessions,
+                    lastActiveDate: this.lastActiveDate,
+                    quickWinsToday: this.quickWinsToday,
+                    dailyStats: this.dailyStats,
+                    currentStreak: this.currentStreak
+                };
+                localStorage.setItem('focusFlowData', JSON.stringify(data));
+                this.showAutoSaveIndicator();
+            }
+
+            loadFromStorage() {
+                const saved = localStorage.getItem('focusFlowData');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    this.tasks = data.tasks || { todo: [], doing: [], done: [] };
+                    this.mainGoal = data.mainGoal || '';
+                    this.focusSessions = data.focusSessions || 0;
+                    this.lastActiveDate = data.lastActiveDate || null;
+                    this.quickWinsToday = data.quickWinsToday || 0;
+                    this.dailyStats = data.dailyStats || {};
+                    this.currentStreak = data.currentStreak || 0;
+                }
+            }
+
+            enterFocusMode() {
+                if (this.tasks.doing.length === 0) {
+                    alert('Add a task to "Doing" column first!');
+                    return;
+                }
+
+                this.focusMode.active = true;
+                this.focusMode.currentTask = this.tasks.doing[0];
+                this.focusMode.timeLeft = this.focusMode.customDuration * 60;
+                this.focusMode.halfwayChimed = false;
+                
+                document.getElementById('focusModeOverlay').style.display = 'flex';
+                document.getElementById('focusTaskText').textContent = `Deep work on: ${this.focusMode.currentTask.text}`;
+                document.getElementById('focusCompletion').classList.add('hidden');
+                
+                // Reset progress bar
+                const progressFill = document.getElementById('focusProgressFill');
+                if (progressFill) {
+                    progressFill.style.width = '0%';
+                }
+                
+                // Update progress bar labels based on custom duration
+                this.updateProgressLabels();
+                
+                // Add pulse effect to focus task
+                document.getElementById('focusTask').classList.add('pulse');
+                
+                this.updateFocusTimer();
+                
+                // Auto-start the timer
+                this.startFocusTimer();
+            }
+
+            startFocusFromTask(taskId) {
+                // Find the specific task
+                const task = this.findTask(taskId);
+                if (!task) return;
+                
+                // Move task to doing if it's not already there
+                const currentColumn = this.findTaskColumn(taskId);
+                if (currentColumn !== 'doing') {
+                    this.moveTask(taskId, currentColumn, 'doing');
+                }
+                
+                // Start focus mode
+                this.enterFocusMode();
+            }
+
+            exitFocusMode() {
+                this.focusMode.active = false;
+                this.focusMode.running = false;
+                if (this.focusMode.timer) {
+                    clearInterval(this.focusMode.timer);
+                    this.focusMode.timer = null;
+                }
+                
+                // Remove pulse effect
+                document.getElementById('focusTask').classList.remove('pulse');
+                
+                document.getElementById('focusModeOverlay').style.display = 'none';
+            }
+
+            startFocusTimer() {
+                if (this.focusMode.running) return;
+                
+                this.focusMode.running = true;
+                this.focusMode.timer = setInterval(() => {
+                    this.focusMode.timeLeft--;
+                    this.updateFocusTimer();
+                    
+                    // Chime at halfway point
+                    const halfwayPoint = Math.floor(this.focusMode.customDuration * 60 / 2);
+                    if (this.focusMode.timeLeft === halfwayPoint && !this.focusMode.halfwayChimed) {
+                        this.playHalfwayChime();
+                        this.focusMode.halfwayChimed = true;
+                    }
+                    
+                    if (this.focusMode.timeLeft <= 0) {
+                        this.completeFocusSession();
+                    }
+                }, 1000);
+                
+                document.getElementById('startTimerBtn').textContent = 'Running...';
+            }
+
+            pauseFocusTimer() {
+                if (!this.focusMode.running) return;
+                
+                this.focusMode.running = false;
+                if (this.focusMode.timer) {
+                    clearInterval(this.focusMode.timer);
+                    this.focusMode.timer = null;
+                }
+                
+                document.getElementById('startTimerBtn').textContent = 'Start';
+            }
+
+            updateFocusTimer() {
+                const minutes = Math.floor(this.focusMode.timeLeft / 60);
+                const seconds = this.focusMode.timeLeft % 60;
+                const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                document.getElementById('focusTimer').textContent = display;
+                
+                // Update progress bar
+                const totalTime = this.focusMode.customDuration * 60; // Custom duration in seconds
+                const elapsed = totalTime - this.focusMode.timeLeft;
+                const progressPercentage = (elapsed / totalTime) * 100;
+                
+                const progressFill = document.getElementById('focusProgressFill');
+                if (progressFill) {
+                    progressFill.style.width = `${progressPercentage}%`;
+                }
+            }
+
+            updateProgressLabels() {
+                const duration = this.focusMode.customDuration;
+                const halfway = Math.floor(duration / 2);
+                
+                const labels = document.querySelector('.focus-progress-labels');
+                if (labels) {
+                    labels.innerHTML = `
+                        <span>0:00</span>
+                        <span class="focus-halfway">${halfway}:00</span>
+                        <span>${duration}:00</span>
+                    `;
+                }
+            }
+
+            completeFocusSession() {
+                this.pauseFocusTimer();
+                this.focusSessions++;
+                this.saveToStorage();
+                
+                // Play completion sound
+                this.playCompletionSound();
+                
+                // Show completion message
+                document.getElementById('focusCompletion').classList.remove('hidden');
+                
+                this.render();
+            }
+
+            completeCurrentTask() {
+                // Just complete the focus session without moving the task
+                this.completeFocusSession();
+            }
+
+            startBreak() {
+                // Reset for break timer (10 minutes after 50-minute session)
+                this.focusMode.timeLeft = 10 * 60;
+                this.focusMode.running = false;
+                this.focusMode.halfwayChimed = false;
+                document.getElementById('focusCompletion').classList.add('hidden');
+                document.getElementById('focusTaskText').textContent = 'Take a break! 🧘‍♀️';
+                document.getElementById('startTimerBtn').textContent = 'Break Running...';
+                
+                this.updateFocusTimer();
+                
+                // Auto-start the break timer
+                this.startFocusTimer();
+            }
+
+            playCompletionSound() {
+                // Create a gentle chime sound using Web Audio API
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.5);
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                } catch (e) {
+                    // Fallback: just show an alert if audio fails
+                    console.log('🔔 Focus session complete!');
+                }
+            }
+
+            playHalfwayChime() {
+                // Create a softer chime for the halfway point
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(500, audioContext.currentTime + 0.3);
+                    
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } catch (e) {
+                    // Fallback: just log if audio fails
+                    console.log('🔔 Halfway through your focus session!');
+                }
+            }
+
+            // Archive System - Completely separate from main app
+            archiveTask(taskId) {
+                // Find task in done column
+                const taskIndex = this.tasks.done.findIndex(task => task.id === taskId);
+                if (taskIndex === -1) return;
+
+                const task = this.tasks.done.splice(taskIndex, 1)[0];
+                
+                // Add to separate archive storage
+                const archived = JSON.parse(localStorage.getItem('focusFlowArchive') || '[]');
+                archived.push({
+                    ...task,
+                    archivedAt: new Date().toISOString(),
+                    timeWorked: this.calculateTimeWorked(task)
+                });
+                
+                localStorage.setItem('focusFlowArchive', JSON.stringify(archived));
+                this.saveToStorage();
+                this.render();
+            }
+
+            calculateTimeWorked(task) {
+                // Simple estimation based on task creation/completion
+                const created = new Date(task.createdAt);
+                const archived = new Date();
+                const diffMinutes = Math.round((archived - created) / (1000 * 60));
+                return Math.min(diffMinutes, 120); // Cap at 2 hours for reasonable estimate
+            }
+
+            showArchive() {
+                const modal = document.getElementById('archiveModal');
+                const content = document.getElementById('archiveContent');
+                
+                const archived = JSON.parse(localStorage.getItem('focusFlowArchive') || '[]');
+                
+                if (archived.length === 0) {
+                    content.innerHTML = '<div style="text-align: center; color: #9ca3af; padding: 2rem;">No archived tasks yet</div>';
+                } else {
+                    // Sort by most recently archived
+                    archived.sort((a, b) => new Date(b.archivedAt) - new Date(a.archivedAt));
+                    
+                    content.innerHTML = archived.map(task => {
+                        const archivedDate = new Date(task.archivedAt).toLocaleDateString();
+                        const createdDate = new Date(task.createdAt).toLocaleDateString();
+                        
+                        return `
+                            <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                                <div style="font-weight: 500; margin-bottom: 0.5rem; color: #e0e6ed;">${task.text}</div>
+                                <div style="font-size: 0.8rem; color: #9ca3af; margin-bottom: 0.5rem;">
+                                    📅 Archived: ${archivedDate} | 📆 Created: ${createdDate} | ⏱️ Est. time: ${task.timeWorked || 0} min
+                                </div>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button onclick="app.restoreTask(${task.id})" style="padding: 4px 8px; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; background: rgba(16, 185, 129, 0.2); color: #10b981;">Restore</button>
+                                    <button onclick="app.deleteArchivedTask(${task.id})" style="padding: 4px 8px; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; background: rgba(239, 68, 68, 0.2); color: #f87171;">Delete</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                modal.style.display = 'block';
+            }
+
+            hideArchive() {
+                document.getElementById('archiveModal').style.display = 'none';
+            }
+
+            restoreTask(taskId) {
+                const archived = JSON.parse(localStorage.getItem('focusFlowArchive') || '[]');
+                const taskIndex = archived.findIndex(task => task.id === taskId);
+                
+                if (taskIndex === -1) return;
+                
+                const task = archived.splice(taskIndex, 1)[0];
+                
+                // Remove archive metadata and restore to done
+                const { archivedAt, timeWorked, ...cleanTask } = task;
+                this.tasks.done.push(cleanTask);
+                
+                localStorage.setItem('focusFlowArchive', JSON.stringify(archived));
+                this.saveToStorage();
+                this.render();
+                this.showArchive(); // Refresh archive view
+            }
+
+            deleteArchivedTask(taskId) {
+                const archived = JSON.parse(localStorage.getItem('focusFlowArchive') || '[]');
+                const filtered = archived.filter(task => task.id !== taskId);
+                
+                localStorage.setItem('focusFlowArchive', JSON.stringify(filtered));
+                this.showArchive(); // Refresh archive view
+            }
+            
+            // Daily Reset System
+            checkForNewDay() {
+                const today = new Date().toDateString();
+                
+                if (this.lastActiveDate && this.lastActiveDate !== today) {
+                    // New day detected!
+                    this.showDailyReset();
+                } else if (!this.lastActiveDate) {
+                    // First time user
+                    this.lastActiveDate = today;
+                    this.saveToStorage();
+                }
+            }
+            
+            showDailyReset() {
+                const overlay = document.getElementById('dailyResetOverlay');
+                const yesterdaySummary = document.getElementById('yesterdaySummary');
+                const yesterdayCount = document.getElementById('yesterdayCount');
+                const quoteText = document.getElementById('dailyQuoteText');
+                const quoteAuthor = document.getElementById('dailyQuoteAuthor');
+                const winGoalInput = document.getElementById('winGoalInput');
+                
+                // Show yesterday's accomplishments if any
+                const doneTasks = this.tasks.done.length;
+                if (doneTasks > 0) {
+                    yesterdaySummary.style.display = 'block';
+                    yesterdayCount.textContent = `${doneTasks} tasks completed \u2713`;
+                }
+                
+                // Show random inspiring quote
+                const quote = this.quotes[Math.floor(Math.random() * this.quotes.length)];
+                quoteText.textContent = `"${quote.text}"`;
+                quoteAuthor.textContent = `— ${quote.author}`;
+                
+                // Clear and focus input
+                winGoalInput.value = '';
+                
+                overlay.style.display = 'flex';
+                
+                // Focus input after animation
+                setTimeout(() => {
+                    winGoalInput.focus();
+                }, 300);
+            }
+            
+            completeDailyReset() {
+                const winGoalInput = document.getElementById('winGoalInput');
+                const winGoal = winGoalInput.value.trim();
+                
+                if (!winGoal) return;
+                
+                // Archive yesterday's done tasks
+                if (this.tasks.done.length > 0) {
+                    const archived = JSON.parse(localStorage.getItem('focusFlowArchive') || '[]');
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    
+                    this.tasks.done.forEach(task => {
+                        archived.push({
+                            ...task,
+                            archivedAt: yesterday.toISOString(),
+                            timeWorked: this.calculateTimeWorked(task),
+                            completedYesterday: true
+                        });
+                    });
+                    
+                    localStorage.setItem('focusFlowArchive', JSON.stringify(archived));
+                    this.tasks.done = []; // Clear done tasks
+                }
+                
+                // Create today's main goal as 5-star task
+                const winTask = {
+                    id: Date.now(),
+                    text: winGoal,
+                    createdAt: new Date().toISOString(),
+                    impact: 5,
+                    isWinGoal: true
+                };
+                
+                // Add to beginning of todo list
+                this.tasks.todo.unshift(winTask);
+                
+                // Update last active date
+                this.lastActiveDate = new Date().toDateString();
+                
+                // Reset focus sessions and quick wins for new day
+                this.focusSessions = 0;
+                this.quickWinsToday = 0;
+                
+                // Update streak
+                this.updateStreak();
+                
+                // Save and refresh
+                this.saveToStorage();
+                this.render();
+                
+                // Hide overlay
+                document.getElementById('dailyResetOverlay').style.display = 'none';
+            }
+            
+            showMomentumCelebration() {
+                const celebration = document.createElement('div');
+                celebration.className = 'momentum-celebration';
+                celebration.innerHTML = `
+                    <h3>Momentum Master! 🔥</h3>
+                    <p>Amazing! You've completed 3 quick wins today. You're building unstoppable momentum!</p>
+                    <button onclick="this.parentElement.remove()">Keep Going!</button>
+                `;
+                
+                document.body.appendChild(celebration);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (celebration.parentElement) {
+                        celebration.remove();
+                    }
+                }, 5000);
+            }
+            
+            updateStatsBar() {
+                const today = new Date().toDateString();
+                const todayCount = this.dailyStats[today] || 0;
+                const weekCount = this.getWeeklyCount();
+                
+                // Update today count with color coding
+                const todayElement = document.getElementById('todayCount');
+                const oldTodayCount = parseInt(todayElement.textContent) || 0;
+                
+                todayElement.textContent = todayCount;
+                todayElement.className = 'stat-value';
+                
+                if (todayCount > 3) {
+                    todayElement.classList.add('green');
+                } else if (todayCount >= 1) {
+                    todayElement.classList.add('yellow');
+                } else {
+                    todayElement.classList.add('red');
+                }
+                
+                // Animate if count increased
+                if (todayCount > oldTodayCount) {
+                    todayElement.classList.add('animate');
+                    setTimeout(() => todayElement.classList.remove('animate'), 400);
+                }
+                
+                // Update other stats
+                const weekElement = document.getElementById('weekCount');
+                const oldWeekCount = parseInt(weekElement.textContent) || 0;
+                weekElement.textContent = weekCount;
+                if (weekCount > oldWeekCount) {
+                    weekElement.classList.add('animate');
+                    setTimeout(() => weekElement.classList.remove('animate'), 400);
+                }
+                
+                const focusElement = document.getElementById('focusCount');
+                focusElement.textContent = this.focusSessions;
+                
+                const streakElement = document.getElementById('streakCount');
+                const oldStreak = parseInt(streakElement.textContent) || 0;
+                streakElement.textContent = this.currentStreak;
+                streakElement.className = 'stat-value';
+                
+                if (this.currentStreak >= 7) {
+                    streakElement.classList.add('green');
+                } else if (this.currentStreak >= 3) {
+                    streakElement.classList.add('yellow');
+                } else if (this.currentStreak === 0) {
+                    streakElement.classList.add('red');
+                } else {
+                    streakElement.classList.add('blue');
+                }
+                
+                if (this.currentStreak > oldStreak) {
+                    streakElement.classList.add('animate');
+                    setTimeout(() => streakElement.classList.remove('animate'), 400);
+                }
+            }
+            
+            getWeeklyCount() {
+                const today = new Date();
+                let total = 0;
+                
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateString = date.toDateString();
+                    total += this.dailyStats[dateString] || 0;
+                }
+                
+                return total;
+            }
+            
+            updateStreak() {
+                const today = new Date();
+                let streak = 0;
+                
+                // Check consecutive days with completed tasks
+                for (let i = 0; i < 365; i++) { // Max 1 year streak
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateString = date.toDateString();
+                    
+                    if ((this.dailyStats[dateString] || 0) > 0) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                this.currentStreak = streak;
+            }
+            
+            showStatsGraph() {
+                const overlay = document.getElementById('statsGraphOverlay');
+                const container = document.getElementById('graphContainer');
+                
+                // Generate last 7 days data
+                const today = new Date();
+                const days = [];
+                
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateString = date.toDateString();
+                    const count = this.dailyStats[dateString] || 0;
+                    
+                    days.push({
+                        label: date.toLocaleDateString('en-US', { weekday: 'short' }),
+                        count: count,
+                        date: dateString
+                    });
+                }
+                
+                // Find max for scaling
+                const maxCount = Math.max(...days.map(d => d.count), 1);
+                
+                // Generate bars
+                container.innerHTML = days.map(day => {
+                    const height = Math.max((day.count / maxCount) * 160, 4);
+                    return `
+                        <div class="graph-bar" style="height: ${height}px;">
+                            <div class="graph-bar-value">${day.count}</div>
+                            <div class="graph-bar-label">${day.label}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                overlay.style.display = 'flex';
+            }
+            
+            hideStatsGraph() {
+                document.getElementById('statsGraphOverlay').style.display = 'none';
+            }
+            
+            // Quick Win Timer System
+            renderQuickWinTimer(taskId) {
+                const timer = this.quickWinTimers[taskId] || { timeLeft: 15 * 60, running: false };
+                const minutes = Math.floor(timer.timeLeft / 60);
+                const seconds = timer.timeLeft % 60;
+                const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                const progress = ((15 * 60 - timer.timeLeft) / (15 * 60)) * 100;
+                const isWarning = timer.timeLeft <= 5 * 60; // Last 5 minutes
+                
+                return `
+                    <div class="quick-win-timer">
+                        <div class="timer-display ${isWarning ? 'warning' : ''}">${display}</div>
+                        <div class="timer-progress">
+                            <div class="timer-progress-bar ${isWarning ? 'warning' : ''}" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="timer-btn start" onclick="app.toggleQuickWinTimer(${taskId})">
+                                ${timer.running ? 'Pause' : 'Start'}
+                            </button>
+                            <button class="timer-btn reset" onclick="app.resetQuickWinTimer(${taskId})">Reset</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            startQuickWinTimer(taskId) {
+                if (!this.quickWinTimers[taskId]) {
+                    this.quickWinTimers[taskId] = {
+                        timeLeft: 15 * 60, // 15 minutes
+                        running: true,
+                        interval: null
+                    };
+                } else {
+                    this.quickWinTimers[taskId].running = true;
+                }
+                
+                this.runQuickWinTimer(taskId);
+                this.render();
+            }
+            
+            stopQuickWinTimer(taskId) {
+                if (this.quickWinTimers[taskId]) {
+                    this.quickWinTimers[taskId].running = false;
+                    if (this.quickWinTimers[taskId].interval) {
+                        clearInterval(this.quickWinTimers[taskId].interval);
+                        this.quickWinTimers[taskId].interval = null;
+                    }
+                }
+            }
+            
+            toggleQuickWinTimer(taskId) {
+                const timer = this.quickWinTimers[taskId];
+                if (!timer) return;
+                
+                if (timer.running) {
+                    this.stopQuickWinTimer(taskId);
+                } else {
+                    timer.running = true;
+                    this.runQuickWinTimer(taskId);
+                }
+                
+                this.render();
+            }
+            
+            resetQuickWinTimer(taskId) {
+                if (this.quickWinTimers[taskId]) {
+                    this.stopQuickWinTimer(taskId);
+                    this.quickWinTimers[taskId].timeLeft = 15 * 60;
+                    this.render();
+                }
+            }
+            
+            runQuickWinTimer(taskId) {
+                const timer = this.quickWinTimers[taskId];
+                if (!timer || timer.interval) return;
+                
+                timer.interval = setInterval(() => {
+                    if (!timer.running) {
+                        clearInterval(timer.interval);
+                        timer.interval = null;
+                        return;
+                    }
+                    
+                    timer.timeLeft--;
+                    
+                    if (timer.timeLeft <= 0) {
+                        // Timer expired
+                        clearInterval(timer.interval);
+                        timer.interval = null;
+                        timer.running = false;
+                        timer.timeLeft = 0;
+                        
+                        // Play notification sound
+                        this.playQuickWinAlert();
+                    }
+                    
+                    // Update only the timer display without full re-render
+                    this.updateTimerDisplay(taskId);
+                }, 1000);
+            }
+            
+            updateTimerDisplay(taskId) {
+                const timer = this.quickWinTimers[taskId];
+                if (!timer) return;
+                
+                const minutes = Math.floor(timer.timeLeft / 60);
+                const seconds = timer.timeLeft % 60;
+                const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                const progress = ((15 * 60 - timer.timeLeft) / (15 * 60)) * 100;
+                const isWarning = timer.timeLeft <= 5 * 60;
+                
+                // Update display elements if they exist
+                const timerElement = document.querySelector(`[onclick="app.toggleQuickWinTimer(${taskId})"]`);
+                if (timerElement) {
+                    const timerContainer = timerElement.closest('.quick-win-timer');
+                    if (timerContainer) {
+                        const displayElement = timerContainer.querySelector('.timer-display');
+                        const progressBar = timerContainer.querySelector('.timer-progress-bar');
+                        const toggleButton = timerContainer.querySelector('.timer-btn.start');
+                        
+                        if (displayElement) {
+                            displayElement.textContent = display;
+                            displayElement.className = `timer-display ${isWarning ? 'warning' : ''}`;
+                        }
+                        
+                        if (progressBar) {
+                            progressBar.style.width = `${progress}%`;
+                            progressBar.className = `timer-progress-bar ${isWarning ? 'warning' : ''}`;
+                        }
+                        
+                        if (toggleButton) {
+                            toggleButton.textContent = timer.running ? 'Pause' : 'Start';
+                        }
+                    }
+                }
+            }
+            
+            playQuickWinAlert() {
+                // Play alert sound for timer completion
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    // Higher pitched alert
+                    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1);
+                    oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.2);
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } catch (e) {
+                    console.log('⏰ Quick Win timer expired!');
+                }
+            }
+            
+            // Quality of Life Features
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    // Ignore if user is typing in an input
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                        return;
+                    }
+                    
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        if (!this.focusMode.active) {
+                            this.enterFocusMode();
+                        }
+                    } else if (e.code === 'KeyN') {
+                        e.preventDefault();
+                        this.showAddTaskInput(false);
+                    }
+                });
+            }
+            
+            showKeyboardHints() {
+                const hint = document.createElement('div');
+                hint.className = 'keyboard-hint';
+                hint.innerHTML = 'Press <strong>Space</strong> for Focus Mode, <strong>N</strong> for New Task';
+                document.body.appendChild(hint);
+                
+                setTimeout(() => hint.classList.add('show'), 100);
+                setTimeout(() => {
+                    hint.classList.remove('show');
+                    setTimeout(() => hint.remove(), 300);
+                }, 3000);
+            }
+            
+            showAutoSaveIndicator() {
+                let indicator = document.getElementById('autoSaveIndicator');
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.id = 'autoSaveIndicator';
+                    indicator.className = 'auto-save-indicator';
+                    indicator.innerHTML = '✓ Saved';
+                    document.body.appendChild(indicator);
+                }
+                
+                indicator.classList.add('show');
+                setTimeout(() => {
+                    indicator.classList.remove('show');
+                }, 1500);
+            }
+            
+            isTaskStale(task, column) {
+                if (column !== 'doing' || !task.movedToDoingAt) return false;
+                
+                const movedDate = new Date(task.movedToDoingAt);
+                const now = new Date();
+                const hoursDiff = (now - movedDate) / (1000 * 60 * 60);
+                
+                return hoursDiff > 24;
+            }
+            
+            editTaskText(taskId) {
+                const taskElement = document.querySelector(`[data-task-id="${taskId}"] .task-text`);
+                if (!taskElement) return;
+                
+                const currentText = taskElement.textContent;
+                const input = document.createElement('input');
+                input.className = 'task-edit-input';
+                input.value = currentText;
+                input.type = 'text';
+                
+                taskElement.parentElement.classList.add('editing');
+                taskElement.innerHTML = '';
+                taskElement.appendChild(input);
+                input.focus();
+                input.select();
+                
+                const saveEdit = () => {
+                    const newText = input.value.trim();
+                    if (newText && newText !== currentText) {
+                        // Find and update the task
+                        for (const column of ['todo', 'doing', 'done']) {
+                            const task = this.tasks[column].find(t => t.id === taskId);
+                            if (task) {
+                                task.text = newText;
+                                this.saveToStorage();
+                                break;
+                            }
+                        }
+                    }
+                    this.render();
+                };
+                
+                input.addEventListener('blur', saveEdit);
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        saveEdit();
+                    }
+                });
+            }
+            
+            showConfetti() {
+                const colors = ['red', 'blue', 'green', 'purple', 'yellow'];
+                const pieces = 30;
+                
+                for (let i = 0; i < pieces; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = `confetti ${colors[Math.floor(Math.random() * colors.length)]}`;
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.animation = 'confetti-fall linear forwards';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }
+            }
+            
+            // Drag and Drop functionality
+            setupDragAndDrop() {
+                // Add event listeners for drag and drop
+                document.addEventListener('dragstart', this.handleDragStart.bind(this));
+                document.addEventListener('dragover', this.handleDragOver.bind(this));
+                document.addEventListener('dragenter', this.handleDragEnter.bind(this));
+                document.addEventListener('dragleave', this.handleDragLeave.bind(this));
+                document.addEventListener('drop', this.handleDrop.bind(this));
+                document.addEventListener('dragend', this.handleDragEnd.bind(this));
+            }
+            
+            handleDragStart(e) {
+                if (!e.target.classList.contains('task-item')) return;
+                
+                const taskId = parseInt(e.target.dataset.taskId);
+                const currentColumn = this.findTaskColumn(taskId);
+                
+                this.dragState = {
+                    taskId: taskId,
+                    sourceColumn: currentColumn,
+                    dragElement: e.target
+                };
+                
+                e.target.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', taskId);
+                
+                // Add visual feedback to valid drop zones
+                document.querySelectorAll('.column, .archive-drop-zone').forEach(zone => {
+                    zone.classList.add('drag-active');
+                });
+                
+                // Show archive drop zone
+                const archiveZone = document.getElementById('archiveDropZone');
+                if (archiveZone) {
+                    archiveZone.classList.add('visible');
+                }
+            }
+            
+            handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            }
+            
+            handleDragEnter(e) {
+                if (e.target.classList.contains('column') || e.target.closest('.column')) {
+                    const column = e.target.classList.contains('column') ? e.target : e.target.closest('.column');
+                    column.classList.add('drag-over');
+                } else if (e.target.classList.contains('archive-drop-zone') || e.target.closest('.archive-drop-zone')) {
+                    const archiveZone = e.target.classList.contains('archive-drop-zone') ? e.target : e.target.closest('.archive-drop-zone');
+                    archiveZone.classList.add('drag-over');
+                }
+            }
+            
+            handleDragLeave(e) {
+                if (e.target.classList.contains('column')) {
+                    e.target.classList.remove('drag-over');
+                } else if (e.target.classList.contains('archive-drop-zone')) {
+                    e.target.classList.remove('drag-over');
+                }
+            }
+            
+            handleDrop(e) {
+                e.preventDefault();
+                
+                if (!this.dragState) return;
+                
+                const { taskId, sourceColumn } = this.dragState;
+                let targetColumn = null;
+                let shouldArchive = false;
+                
+                // Determine drop target
+                if (e.target.classList.contains('archive-drop-zone') || e.target.closest('.archive-drop-zone')) {
+                    shouldArchive = true;
+                } else if (e.target.classList.contains('column') || e.target.closest('.column')) {
+                    const column = e.target.classList.contains('column') ? e.target : e.target.closest('.column');
+                    targetColumn = column.dataset.column;
+                }
+                
+                if (shouldArchive) {
+                    // Archive the task (only from done column)
+                    if (sourceColumn === 'done') {
+                        const task = this.findTask(taskId);
+                        if (task) {
+                            this.archiveTask(taskId);
+                            this.showAutoSaveIndicator();
+                        }
+                    }
+                } else if (targetColumn && targetColumn !== sourceColumn) {
+                    // Validate move to "doing" column (max 3 tasks)
+                    if (targetColumn === 'doing' && this.tasks.doing.length >= 3) {
+                        // Show a visual feedback that move was rejected
+                        const doingColumn = document.querySelector('[data-column="doing"]');
+                        if (doingColumn) {
+                            doingColumn.style.border = '2px solid #ef4444';
+                            setTimeout(() => {
+                                doingColumn.style.border = '';
+                            }, 1000);
+                        }
+                        return;
+                    }
+                    
+                    // Move to different column
+                    this.moveTask(taskId, sourceColumn, targetColumn);
+                    this.showAutoSaveIndicator();
+                }
+                
+                // Clean up drag state
+                this.cleanupDragState();
+            }
+            
+            handleDragEnd(e) {
+                this.cleanupDragState();
+            }
+            
+            cleanupDragState() {
+                if (this.dragState && this.dragState.dragElement) {
+                    this.dragState.dragElement.classList.remove('dragging');
+                }
+                
+                // Remove all drag-related classes
+                document.querySelectorAll('.drag-active, .drag-over').forEach(el => {
+                    el.classList.remove('drag-active', 'drag-over');
+                });
+                
+                // Hide archive drop zone
+                const archiveZone = document.getElementById('archiveDropZone');
+                if (archiveZone) {
+                    archiveZone.classList.remove('visible');
+                }
+                
+                this.dragState = null;
+            }
+            
+            findTaskColumn(taskId) {
+                for (const [column, tasks] of Object.entries(this.tasks)) {
+                    if (tasks.some(task => task.id === taskId)) {
+                        return column;
+                    }
+                }
+                return null;
+            }
+            
+            findTask(taskId) {
+                for (const tasks of Object.values(this.tasks)) {
+                    const task = tasks.find(task => task.id === taskId);
+                    if (task) return task;
+                }
+                return null;
+            }
+        }
+
+        // Initialize the app
+        const app = new FocusFlow();
+    </script>
+</body>
+</html>
