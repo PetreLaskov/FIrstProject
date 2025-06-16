@@ -71,6 +71,49 @@
             color: #9ca3af;
         }
 
+        .main-goal-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: #e2e6ea;
+            border-radius: 12px;
+            border: 1px solid #d1d7dc;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .main-goal-headline {
+            color: #000000;
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 0;
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        .edit-goal-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #d1d7dc;
+            border: 1px solid #b8c0c8;
+            color: #000000;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .edit-goal-btn:hover {
+            background: #c4cbd3;
+            transform: translateY(-1px);
+        }
+
         .focus-mode-section {
             text-align: center;
             margin-bottom: 2rem;
@@ -1436,15 +1479,587 @@
             margin-bottom: 0.5rem;
         }
 
+        /* Side Panel Styles */
+        .panel-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #e0e6ed;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .panel-toggle-btn:hover {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: #a78bfa;
+            transform: scale(1.05);
+        }
+
+        .side-panel {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .side-panel.open {
+            right: 0;
+        }
+
+        .panel-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(167, 139, 250, 0.1);
+        }
+
+        .panel-title {
+            color: #a78bfa;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .panel-section {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .section-header:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .section-title {
+            color: #e0e6ed;
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .section-arrow {
+            color: #9ca3af;
+            font-size: 0.8rem;
+            transition: transform 0.2s ease;
+        }
+
+        .section-header.collapsed .section-arrow {
+            transform: rotate(-90deg);
+        }
+
+        .section-content {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            max-height: 200px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .section-content.collapsed {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .goal-input-panel {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #e0e6ed;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .goal-input-panel:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.1);
+        }
+
+        .goal-input-panel::placeholder {
+            color: #9ca3af;
+        }
+
+        .vision-input {
+            background: rgba(147, 51, 234, 0.1);
+            border: 1px solid rgba(147, 51, 234, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #e0e6ed;
+            font-size: 0.95rem;
+            width: 100%;
+            min-height: 80px;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .vision-input:focus {
+            outline: none;
+            border-color: #9333ea;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+            background: rgba(147, 51, 234, 0.15);
+        }
+
+        .vision-input::placeholder {
+            color: #b794f6;
+        }
+
+        .add-goal-btn {
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: #a78bfa;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 1rem;
+        }
+
+        .add-goal-btn:hover {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: #a78bfa;
+        }
+
+        .goal-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            color: #e0e6ed;
+            font-size: 0.85rem;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .goal-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .goal-item:hover .goal-item-delete {
+            opacity: 1;
+        }
+
+        .goal-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .goal-item-text {
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        .goal-item-text.editing {
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid #a78bfa;
+            border-radius: 4px;
+            padding: 4px 8px;
+            outline: none;
+            color: #e0e6ed;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        .goal-item-delete {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: #ef4444;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0;
+            margin-left: 0.5rem;
+        }
+
+        .goal-item-delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+        }
+
+        .goal-progress-container {
+            position: relative;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .goal-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444 0%, #f59e0b 30%, #eab308 60%, #22c55e 100%);
+            border-radius: 8px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .goal-progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .goal-input-temp {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #e0e6ed;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .goal-input-temp:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.1);
+        }
+
+        .task-item.selected {
+            background: rgba(167, 139, 250, 0.2);
+            border: 2px solid #a78bfa;
+            box-shadow: 0 0 12px rgba(167, 139, 250, 0.3);
+            transform: scale(1.02);
+        }
+
+        .task-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .task-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Pre-Focus Ritual Styles */
+        .pre-focus-ritual {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 3000;
+            display: none;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .ritual-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .ritual-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .ritual-title {
+            color: #a78bfa;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .ritual-subtitle {
+            color: #9ca3af;
+            font-size: 1rem;
+        }
+
+        .ritual-checklist {
+            margin-bottom: 2rem;
+        }
+
+        .checklist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .checklist-title {
+            color: #e0e6ed;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .add-item-btn {
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: #a78bfa;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-item-btn:hover {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: #a78bfa;
+        }
+
+        .checklist-items {
+            space-y: 0.5rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .checklist-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .checklist-item.completed {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .checklist-item.completed .item-text {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .item-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(167, 139, 250, 0.5);
+            border-radius: 4px;
+            margin-right: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item.completed .item-checkbox {
+            background: #a78bfa;
+            border-color: #a78bfa;
+        }
+
+        .item-checkbox::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .checklist-item.completed .item-checkbox::after {
+            opacity: 1;
+        }
+
+        .item-text {
+            flex: 1;
+            color: #e0e6ed;
+            font-size: 0.95rem;
+        }
+
+        .item-delete {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: #ef4444;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0;
+            margin-left: 0.5rem;
+        }
+
+        .checklist-item:hover .item-delete {
+            opacity: 1;
+        }
+
+        .item-delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+        }
+
+        .drag-handle {
+            margin-left: 0.5rem;
+            color: #9ca3af;
+            cursor: grab;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .checklist-item:hover .drag-handle {
+            opacity: 1;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .session-intention {
+            margin-bottom: 2rem;
+        }
+
+        .intention-label {
+            color: #e0e6ed;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .intention-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #e0e6ed;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .intention-input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+        }
+
+        .intention-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .ritual-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .ritual-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .ritual-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .ritual-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .ritual-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e6ed;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .ritual-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .ritual-preferences {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .preference-checkbox {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .preference-checkbox input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #a78bfa;
+        }
+
     </style>
 </head>
 <body>
+    <!-- Panel Toggle Button -->
+    <button class="panel-toggle-btn" id="panelToggleBtn">📊</button>
+    
     <div class="container">
         <h1>Focus Flow</h1>
         
         <div class="goal-section">
-            <h2>Today's Main Goal</h2>
-            <input type="text" id="mainGoal" class="goal-input" placeholder="What's your main focus for today?">
+            <div id="goalInputSection">
+                <h2>Today's Main Goal</h2>
+                <input type="text" id="mainGoal" class="goal-input" placeholder="What's your main focus for today?">
+            </div>
+            <div id="mainGoalDisplay" class="main-goal-display" style="display: none;">
+                <h1 class="main-goal-headline">Main Focus: <span id="mainGoalText"></span></h1>
+                <button id="editGoalBtn" class="edit-goal-btn">✏️ Edit</button>
+            </div>
         </div>
 
         <div class="focus-mode-section">
@@ -1616,6 +2231,67 @@
         </div>
     </div>
 
+    <!-- Side Panel -->
+    <div class="side-panel" id="sidePanel">
+        <div class="panel-header">
+            <h2 class="panel-title">Goal Hierarchy</h2>
+        </div>
+        
+        <div class="panel-section">
+            <div class="section-header" data-section="vision">
+                <h3 class="section-title">Vision</h3>
+                <span class="section-arrow">▼</span>
+            </div>
+            <div class="section-content" id="visionContent">
+                <textarea class="vision-input" id="visionInput" placeholder="What's your long-term vision?"></textarea>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="section-header collapsed" data-section="yearly">
+                <h3 class="section-title">Yearly Goals</h3>
+                <span class="section-arrow">▼</span>
+            </div>
+            <div class="section-content collapsed" id="yearlyContent">
+                <button class="add-goal-btn" onclick="app.showGoalInput('yearly')">+ Add Yearly Goal</button>
+                <div id="yearlyGoalsList"></div>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="section-header collapsed" data-section="quarterly">
+                <h3 class="section-title">Quarterly Goals</h3>
+                <span class="section-arrow">▼</span>
+            </div>
+            <div class="section-content collapsed" id="quarterlyContent">
+                <button class="add-goal-btn" onclick="app.showGoalInput('quarterly')">+ Add Quarterly Goal</button>
+                <div id="quarterlyGoalsList"></div>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="section-header collapsed" data-section="monthly">
+                <h3 class="section-title">Monthly Goals</h3>
+                <span class="section-arrow">▼</span>
+            </div>
+            <div class="section-content collapsed" id="monthlyContent">
+                <button class="add-goal-btn" onclick="app.showGoalInput('monthly')">+ Add Monthly Goal</button>
+                <div id="monthlyGoalsList"></div>
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="section-header collapsed" data-section="weekly">
+                <h3 class="section-title">Weekly Goals</h3>
+                <span class="section-arrow">▼</span>
+            </div>
+            <div class="section-content collapsed" id="weeklyContent">
+                <button class="add-goal-btn" onclick="app.showGoalInput('weekly')">+ Add Weekly Goal</button>
+                <div id="weeklyGoalsList"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Archive Modal -->
     <div id="archiveModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; padding: 20px; overflow-y: auto;">
         <div style="background: rgba(26, 26, 46, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; max-width: 800px; margin: 50px auto; padding: 2rem;">
@@ -1624,6 +2300,48 @@
                 <button id="closeArchive" style="background: rgba(255, 255, 255, 0.1); border: none; color: #9ca3af; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 1.2rem;">×</button>
             </div>
             <div id="archiveContent"></div>
+        </div>
+    </div>
+
+    <!-- Pre-Focus Ritual Screen -->
+    <div class="pre-focus-ritual" id="preFocusRitual">
+        <div class="ritual-container">
+            <div class="ritual-header">
+                <h2 class="ritual-title">🧘 Pre-Focus Ritual</h2>
+                <p class="ritual-subtitle">Prepare your mind and space for deep focus</p>
+            </div>
+
+            <div class="ritual-checklist">
+                <div class="checklist-header">
+                    <h3 class="checklist-title">Preparation Checklist</h3>
+                    <button class="add-item-btn" id="addRitualItem">+ Add Custom Item</button>
+                </div>
+                <div class="checklist-items" id="ritualChecklistItems">
+                    <!-- Default and custom items will be rendered here -->
+                </div>
+            </div>
+
+            <div class="session-intention">
+                <label class="intention-label" for="sessionIntention">🎯 Session Intention</label>
+                <textarea 
+                    id="sessionIntention" 
+                    class="intention-input" 
+                    placeholder="What does success look like for this focus session? What specific outcome are you aiming for?"
+                    rows="3">
+                </textarea>
+            </div>
+
+            <div class="ritual-controls">
+                <button class="ritual-btn secondary" id="skipRitualBtn">Skip Ritual</button>
+                <button class="ritual-btn primary" id="startFocusSessionBtn">Start Focus Session</button>
+            </div>
+
+            <div class="ritual-preferences">
+                <label class="preference-checkbox">
+                    <input type="checkbox" id="useAsDefaultRitual">
+                    <span>Use this ritual as my default</span>
+                </label>
+            </div>
         </div>
     </div>
 
@@ -1636,6 +2354,24 @@
                     done: []
                 };
                 this.mainGoal = '';
+                this.visionStatement = '';
+                this.hierarchicalGoals = {
+                    yearly: [],
+                    quarterly: [],
+                    monthly: [],
+                    weekly: []
+                };
+                this.selectedTaskId = null;
+                this.ritualChecklist = [
+                    { id: 1, text: '💧 Water bottle filled', emoji: '💧', isDefault: true, completed: false },
+                    { id: 2, text: '📱 Phone on silent/away', emoji: '📱', isDefault: true, completed: false },
+                    { id: 3, text: '🚽 Bathroom break taken', emoji: '🚽', isDefault: true, completed: false },
+                    { id: 4, text: '🧹 Workspace cleared', emoji: '🧹', isDefault: true, completed: false },
+                    { id: 5, text: '🎯 Clear intention set', emoji: '🎯', isDefault: true, completed: false }
+                ];
+                this.customRitualItems = [];
+                this.useRitualAsDefault = true;
+                this.currentSessionIntention = '';
                 this.focusSessions = 0;
                 this.lastActiveDate = null;
                 this.quickWinsToday = 0;
@@ -1672,6 +2408,7 @@
                 this.setupEventListeners();
                 this.setupDragAndDrop();
                 this.render();
+                this.renderVisionAndGoals();
             }
 
             setupEventListeners() {
@@ -1685,9 +2422,25 @@
                 const completeTaskBtn = document.getElementById('completeTaskBtn');
                 const startBreakBtn = document.getElementById('startBreakBtn');
 
-                mainGoalInput.addEventListener('input', (e) => {
-                    this.mainGoal = e.target.value;
-                    this.saveToStorage();
+                mainGoalInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.setMainGoal(e.target.value);
+                    }
+                });
+
+                mainGoalInput.addEventListener('blur', (e) => {
+                    this.setMainGoal(e.target.value);
+                });
+
+                const editGoalBtn = document.getElementById('editGoalBtn');
+                editGoalBtn.addEventListener('click', () => {
+                    this.editMainGoal();
+                });
+
+                // Vision input event listener
+                const visionInput = document.getElementById('visionInput');
+                visionInput.addEventListener('blur', () => {
+                    this.saveVisionStatement(visionInput.value);
                 });
 
                 addTaskBtn.addEventListener('click', () => {
@@ -1761,6 +2514,29 @@
                 // Show keyboard hints briefly on load
                 this.showKeyboardHints();
                 
+                // Pre-Focus Ritual event listeners
+                const addRitualItemBtn = document.getElementById('addRitualItem');
+                const skipRitualBtn = document.getElementById('skipRitualBtn');
+                const startFocusSessionBtn = document.getElementById('startFocusSessionBtn');
+                const useAsDefaultCheckbox = document.getElementById('useAsDefaultRitual');
+
+                addRitualItemBtn.addEventListener('click', () => {
+                    this.addCustomRitualItem();
+                });
+
+                skipRitualBtn.addEventListener('click', () => {
+                    this.skipRitual();
+                });
+
+                startFocusSessionBtn.addEventListener('click', () => {
+                    this.completeRitual();
+                });
+
+                useAsDefaultCheckbox.addEventListener('change', (e) => {
+                    this.useRitualAsDefault = e.target.checked;
+                    this.saveToStorage();
+                });
+                
                 // Daily reset functionality
                 const winGoalInput = document.getElementById('winGoalInput');
                 const startDayBtn = document.getElementById('startDayBtn');
@@ -1771,6 +2547,20 @@
                 
                 startDayBtn.addEventListener('click', () => {
                     this.completeDailyReset();
+                });
+
+                // Side panel event listeners
+                const panelToggleBtn = document.getElementById('panelToggleBtn');
+                panelToggleBtn.addEventListener('click', () => {
+                    this.toggleSidePanel();
+                });
+
+                // Section collapse event listeners
+                const sectionHeaders = document.querySelectorAll('.section-header');
+                sectionHeaders.forEach(header => {
+                    header.addEventListener('click', () => {
+                        this.toggleSection(header.dataset.section);
+                    });
                 });
 
                 // Timer preset event listeners
@@ -1822,6 +2612,56 @@
                 
                 taskForm.style.display = 'block';
                 todoInput.focus();
+                
+                // Page Visibility API to handle tab switching
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) {
+                        // Tab became active, update all running timers
+                        if (this.focusMode.running) {
+                            this.updateFocusTimerFromTimestamp();
+                        }
+                        
+                        // Update all running quick win timers
+                        Object.keys(this.quickWinTimers).forEach(taskId => {
+                            const timer = this.quickWinTimers[taskId];
+                            if (timer && timer.running) {
+                                this.updateQuickWinTimerFromTimestamp(taskId);
+                            }
+                        });
+                    }
+                });
+            }
+
+            setMainGoal(value) {
+                this.mainGoal = value.trim();
+                this.saveToStorage();
+                this.updateMainGoalDisplay();
+            }
+
+            updateMainGoalDisplay() {
+                const inputSection = document.getElementById('goalInputSection');
+                const display = document.getElementById('mainGoalDisplay');
+                const text = document.getElementById('mainGoalText');
+                
+                if (this.mainGoal.trim()) {
+                    text.textContent = this.mainGoal;
+                    inputSection.style.display = 'none';
+                    display.style.display = 'flex';
+                } else {
+                    inputSection.style.display = 'block';
+                    display.style.display = 'none';
+                }
+            }
+
+            editMainGoal() {
+                const inputSection = document.getElementById('goalInputSection');
+                const display = document.getElementById('mainGoalDisplay');
+                const input = document.getElementById('mainGoal');
+                
+                inputSection.style.display = 'block';
+                display.style.display = 'none';
+                input.focus();
+                input.select();
             }
 
             setupStarRating() {
@@ -1877,6 +2717,19 @@
                 this.tasks.todo.push(task);
                 this.saveToStorage();
                 this.render();
+                
+                // Auto-scroll to and select the newly created task
+                setTimeout(() => {
+                    const newTaskElement = document.querySelector(`[data-task-id="${task.id}"]`);
+                    if (newTaskElement) {
+                        newTaskElement.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center' 
+                        });
+                        // Select the newly created task
+                        this.selectTask(task.id);
+                    }
+                }, 100);
                 
                 // Reset form
                 this.currentTaskRating = 3;
@@ -1992,7 +2845,8 @@
                 const isQuickWin = task.isQuickWin;
                 const isStale = this.isTaskStale(task, column);
                 
-                taskDiv.className = `task task-item ${isQuickWin ? 'quick-win' : `impact-${impact}`} ${isStale ? 'stale' : ''}`;
+                const isSelected = this.selectedTaskId === task.id;
+                taskDiv.className = `task task-item ${isQuickWin ? 'quick-win' : `impact-${impact}`} ${isStale ? 'stale' : ''} ${isSelected ? 'selected' : ''}`;
                 taskDiv.setAttribute('data-task-id', task.id);
                 taskDiv.setAttribute('draggable', 'true');
                 
@@ -2035,6 +2889,15 @@
                     taskDiv.classList.remove('dragging');
                 });
                 
+                // Add click listener for task selection
+                taskDiv.addEventListener('click', (e) => {
+                    // Don't select if clicking on buttons
+                    if (e.target.tagName === 'BUTTON') {
+                        return;
+                    }
+                    this.selectTask(task.id);
+                });
+                
                 return taskDiv;
             }
             
@@ -2069,6 +2932,7 @@
             render() {
                 // Update main goal
                 document.getElementById('mainGoal').value = this.mainGoal;
+                this.updateMainGoalDisplay();
 
                 // Update focus sessions counter
                 document.getElementById('focusSessions').textContent = `Focus sessions completed today: ${this.focusSessions}`;
@@ -2110,7 +2974,11 @@
                     lastActiveDate: this.lastActiveDate,
                     quickWinsToday: this.quickWinsToday,
                     dailyStats: this.dailyStats,
-                    currentStreak: this.currentStreak
+                    currentStreak: this.currentStreak,
+                    visionStatement: this.visionStatement,
+                    hierarchicalGoals: this.hierarchicalGoals,
+                    customRitualItems: this.customRitualItems,
+                    useRitualAsDefault: this.useRitualAsDefault
                 };
                 localStorage.setItem('focusFlowData', JSON.stringify(data));
                 this.showAutoSaveIndicator();
@@ -2127,6 +2995,10 @@
                     this.quickWinsToday = data.quickWinsToday || 0;
                     this.dailyStats = data.dailyStats || {};
                     this.currentStreak = data.currentStreak || 0;
+                    this.visionStatement = data.visionStatement || '';
+                    this.hierarchicalGoals = data.hierarchicalGoals || { yearly: [], quarterly: [], monthly: [], weekly: [] };
+                    this.customRitualItems = data.customRitualItems || [];
+                    this.useRitualAsDefault = data.useRitualAsDefault !== undefined ? data.useRitualAsDefault : true;
                 }
             }
 
@@ -2135,6 +3007,25 @@
                     alert('Add a task to "Doing" column first!');
                     return;
                 }
+                
+                // Show Pre-Focus Ritual if enabled
+                if (this.useRitualAsDefault) {
+                    this.showPreFocusRitual();
+                } else {
+                    this.startActualFocusMode();
+                }
+            }
+
+            showPreFocusRitual() {
+                this.resetRitualChecklist();
+                this.renderRitualChecklist();
+                document.getElementById('preFocusRitual').style.display = 'block';
+                
+                // Set checkbox state
+                document.getElementById('useAsDefaultRitual').checked = this.useRitualAsDefault;
+            }
+
+            startActualFocusMode() {
 
                 this.focusMode.active = true;
                 this.focusMode.currentTask = this.tasks.doing[0];
@@ -2196,23 +3087,35 @@
                 if (this.focusMode.running) return;
                 
                 this.focusMode.running = true;
+                // Calculate how much time should be "already elapsed" based on current timeLeft
+                const totalSeconds = this.focusMode.customDuration * 60;
+                const alreadyElapsed = totalSeconds - this.focusMode.timeLeft;
+                this.focusMode.startTime = Date.now() - (alreadyElapsed * 1000);
+                
                 this.focusMode.timer = setInterval(() => {
-                    this.focusMode.timeLeft--;
-                    this.updateFocusTimer();
-                    
-                    // Chime at halfway point
-                    const halfwayPoint = Math.floor(this.focusMode.customDuration * 60 / 2);
-                    if (this.focusMode.timeLeft === halfwayPoint && !this.focusMode.halfwayChimed) {
-                        this.playHalfwayChime();
-                        this.focusMode.halfwayChimed = true;
-                    }
-                    
-                    if (this.focusMode.timeLeft <= 0) {
-                        this.completeFocusSession();
-                    }
+                    this.updateFocusTimerFromTimestamp();
                 }, 1000);
                 
                 document.getElementById('startTimerBtn').textContent = 'Running...';
+            }
+
+            updateFocusTimerFromTimestamp() {
+                const elapsedSeconds = Math.floor((Date.now() - this.focusMode.startTime) / 1000);
+                const totalSeconds = this.focusMode.customDuration * 60;
+                this.focusMode.timeLeft = Math.max(0, totalSeconds - elapsedSeconds);
+                
+                this.updateFocusTimer();
+                
+                // Chime at halfway point
+                const halfwayPoint = Math.floor(totalSeconds / 2);
+                if (elapsedSeconds >= halfwayPoint && !this.focusMode.halfwayChimed) {
+                    this.playHalfwayChime();
+                    this.focusMode.halfwayChimed = true;
+                }
+                
+                if (this.focusMode.timeLeft <= 0) {
+                    this.completeFocusSession();
+                }
             }
 
             pauseFocusTimer() {
@@ -2223,6 +3126,9 @@
                     clearInterval(this.focusMode.timer);
                     this.focusMode.timer = null;
                 }
+                
+                // Save the current remaining time when pausing
+                this.updateFocusTimerFromTimestamp();
                 
                 document.getElementById('startTimerBtn').textContent = 'Start';
             }
@@ -2516,6 +3422,9 @@
                 // Add to beginning of todo list
                 this.tasks.todo.unshift(winTask);
                 
+                // Set as main goal headline
+                this.setMainGoal(winGoal);
+                
                 // Update last active date
                 this.lastActiveDate = new Date().toDateString();
                 
@@ -2764,6 +3673,11 @@
                 const timer = this.quickWinTimers[taskId];
                 if (!timer || timer.interval) return;
                 
+                // Calculate start time based on current timeLeft
+                const totalSeconds = 15 * 60;
+                const alreadyElapsed = totalSeconds - timer.timeLeft;
+                timer.startTime = Date.now() - (alreadyElapsed * 1000);
+                
                 timer.interval = setInterval(() => {
                     if (!timer.running) {
                         clearInterval(timer.interval);
@@ -2771,22 +3685,31 @@
                         return;
                     }
                     
-                    timer.timeLeft--;
-                    
-                    if (timer.timeLeft <= 0) {
-                        // Timer expired
-                        clearInterval(timer.interval);
-                        timer.interval = null;
-                        timer.running = false;
-                        timer.timeLeft = 0;
-                        
-                        // Play notification sound
-                        this.playQuickWinAlert();
-                    }
-                    
-                    // Update only the timer display without full re-render
-                    this.updateTimerDisplay(taskId);
+                    this.updateQuickWinTimerFromTimestamp(taskId);
                 }, 1000);
+            }
+
+            updateQuickWinTimerFromTimestamp(taskId) {
+                const timer = this.quickWinTimers[taskId];
+                if (!timer) return;
+                
+                const elapsedSeconds = Math.floor((Date.now() - timer.startTime) / 1000);
+                const totalSeconds = 15 * 60;
+                timer.timeLeft = Math.max(0, totalSeconds - elapsedSeconds);
+                
+                if (timer.timeLeft <= 0) {
+                    // Timer expired
+                    clearInterval(timer.interval);
+                    timer.interval = null;
+                    timer.running = false;
+                    timer.timeLeft = 0;
+                    
+                    // Play notification sound
+                    this.playQuickWinAlert();
+                }
+                
+                // Update only the timer display without full re-render
+                this.updateTimerDisplay(taskId);
             }
             
             updateTimerDisplay(taskId) {
@@ -2866,6 +3789,21 @@
                     } else if (e.code === 'KeyN') {
                         e.preventDefault();
                         this.showAddTaskInput(false);
+                    } else if (e.code === 'KeyQ') {
+                        e.preventDefault();
+                        this.showAddTaskInput(true); // Quick win task
+                    } else if (e.code === 'KeyA') {
+                        e.preventDefault();
+                        this.showAddTaskInput(false); // Regular task
+                    } else if (e.code === 'ArrowLeft') {
+                        e.preventDefault();
+                        this.moveSelectedTask('left'); // Move selected task to previous column
+                    } else if (e.code === 'ArrowRight') {
+                        e.preventDefault();
+                        this.moveSelectedTask('right'); // Move selected task to next column
+                    } else if (e.code === 'Escape') {
+                        e.preventDefault();
+                        this.deselectTask(); // Deselect the currently selected task
                     }
                 });
             }
@@ -2873,7 +3811,7 @@
             showKeyboardHints() {
                 const hint = document.createElement('div');
                 hint.className = 'keyboard-hint';
-                hint.innerHTML = 'Press <strong>Space</strong> for Focus Mode, <strong>N</strong> for New Task';
+                hint.innerHTML = 'Press <strong>Space</strong> for Focus Mode, <strong>A</strong> for Add Task, <strong>Q</strong> for Quick Win, <strong>←/→</strong> to Move Tasks, <strong>Esc</strong> to Deselect';
                 document.body.appendChild(hint);
                 
                 setTimeout(() => hint.classList.add('show'), 100);
@@ -3118,6 +4056,422 @@
                     if (task) return task;
                 }
                 return null;
+            }
+
+            toggleSidePanel() {
+                const sidePanel = document.getElementById('sidePanel');
+                sidePanel.classList.toggle('open');
+            }
+
+            toggleSection(sectionName) {
+                const header = document.querySelector(`[data-section="${sectionName}"]`);
+                const content = document.getElementById(`${sectionName}Content`);
+                
+                header.classList.toggle('collapsed');
+                content.classList.toggle('collapsed');
+            }
+
+            saveVisionStatement(vision) {
+                this.visionStatement = vision.trim();
+                this.saveToStorage();
+            }
+
+            showGoalInput(timeHorizon) {
+                const container = document.getElementById(`${timeHorizon}GoalsList`);
+                
+                // Check if input already exists
+                if (container.querySelector('.goal-input-temp')) {
+                    return;
+                }
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'goal-input-temp';
+                input.placeholder = `Enter ${timeHorizon} goal...`;
+                let processed = false;
+                
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !processed) {
+                        processed = true;
+                        this.addGoal(timeHorizon, e.target.value.trim());
+                        input.remove();
+                    }
+                });
+                
+                input.addEventListener('blur', () => {
+                    if (!processed && input.value.trim()) {
+                        processed = true;
+                        this.addGoal(timeHorizon, input.value.trim());
+                    }
+                    if (!processed) {
+                        input.remove();
+                    }
+                });
+                
+                container.insertBefore(input, container.firstChild);
+                input.focus();
+            }
+
+            addGoal(timeHorizon, text) {
+                if (!text) return;
+                
+                const goal = {
+                    id: Date.now(),
+                    text: text,
+                    timeHorizon: timeHorizon,
+                    createdAt: new Date().toISOString(),
+                    progress: 0
+                };
+                
+                this.hierarchicalGoals[timeHorizon].push(goal);
+                this.saveToStorage();
+                this.renderGoals(timeHorizon);
+            }
+
+            deleteGoal(timeHorizon, goalId) {
+                this.hierarchicalGoals[timeHorizon] = this.hierarchicalGoals[timeHorizon].filter(
+                    goal => goal.id !== goalId
+                );
+                this.saveToStorage();
+                this.renderGoals(timeHorizon);
+            }
+
+            renderGoals(timeHorizon) {
+                const container = document.getElementById(`${timeHorizon}GoalsList`);
+                const goals = this.hierarchicalGoals[timeHorizon];
+                
+                // Clear existing goals (but keep any input field)
+                const existingGoals = container.querySelectorAll('.goal-item');
+                existingGoals.forEach(item => item.remove());
+                
+                goals.forEach(goal => {
+                    const progress = goal.progress || 0;
+                    const goalItem = document.createElement('div');
+                    goalItem.className = 'goal-item';
+                    goalItem.setAttribute('data-goal-id', goal.id);
+                    
+                    goalItem.innerHTML = `
+                        <div class="goal-item-header">
+                            <div class="goal-item-text" data-original-text="${goal.text}">${goal.text}</div>
+                            <button class="goal-item-delete" onclick="app.deleteGoal('${timeHorizon}', ${goal.id})">✕</button>
+                        </div>
+                        <div class="goal-progress-container">
+                            <div class="goal-progress-bar" style="width: ${progress}%"></div>
+                            <div class="goal-progress-text">${progress}%</div>
+                        </div>
+                    `;
+                    
+                    // Add double-click listener for editing
+                    const textElement = goalItem.querySelector('.goal-item-text');
+                    textElement.addEventListener('dblclick', () => {
+                        this.editGoal(timeHorizon, goal.id, textElement);
+                    });
+                    
+                    container.appendChild(goalItem);
+                });
+            }
+
+            renderAllGoals() {
+                ['yearly', 'quarterly', 'monthly', 'weekly'].forEach(timeHorizon => {
+                    this.renderGoals(timeHorizon);
+                });
+            }
+
+            editGoal(timeHorizon, goalId, textElement) {
+                const originalText = textElement.dataset.originalText;
+                
+                // Create input element
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = originalText;
+                input.className = 'goal-item-text editing';
+                
+                // Replace text with input
+                textElement.parentNode.replaceChild(input, textElement);
+                input.focus();
+                input.select();
+                
+                const finishEdit = () => {
+                    const newText = input.value.trim();
+                    if (newText && newText !== originalText) {
+                        this.updateGoal(timeHorizon, goalId, { text: newText });
+                    } else {
+                        // Re-render to restore original state
+                        this.renderGoals(timeHorizon);
+                    }
+                };
+                
+                input.addEventListener('blur', finishEdit);
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        finishEdit();
+                    }
+                });
+            }
+
+            updateGoal(timeHorizon, goalId, updates) {
+                const goal = this.hierarchicalGoals[timeHorizon].find(g => g.id === goalId);
+                if (goal) {
+                    Object.assign(goal, updates);
+                    this.saveToStorage();
+                    this.renderGoals(timeHorizon);
+                }
+            }
+
+            renderVisionAndGoals() {
+                // Populate vision input
+                const visionInput = document.getElementById('visionInput');
+                if (visionInput) {
+                    visionInput.value = this.visionStatement;
+                }
+                
+                // Render all goals
+                this.renderAllGoals();
+            }
+
+            selectTask(taskId) {
+                // Deselect current task
+                if (this.selectedTaskId) {
+                    const currentSelected = document.querySelector(`[data-task-id="${this.selectedTaskId}"]`);
+                    if (currentSelected) {
+                        currentSelected.classList.remove('selected');
+                    }
+                }
+                
+                // Select new task
+                this.selectedTaskId = taskId;
+                const newSelected = document.querySelector(`[data-task-id="${taskId}"]`);
+                if (newSelected) {
+                    newSelected.classList.add('selected');
+                }
+            }
+
+            deselectTask() {
+                if (this.selectedTaskId) {
+                    const currentSelected = document.querySelector(`[data-task-id="${this.selectedTaskId}"]`);
+                    if (currentSelected) {
+                        currentSelected.classList.remove('selected');
+                    }
+                    this.selectedTaskId = null;
+                }
+            }
+
+            getSelectedTaskColumn() {
+                if (!this.selectedTaskId) return null;
+                
+                for (const [column, tasks] of Object.entries(this.tasks)) {
+                    if (tasks.find(task => task.id === this.selectedTaskId)) {
+                        return column;
+                    }
+                }
+                return null;
+            }
+
+            moveSelectedTask(direction) {
+                if (!this.selectedTaskId) return;
+                
+                const currentColumn = this.getSelectedTaskColumn();
+                if (!currentColumn) return;
+                
+                let targetColumn;
+                switch (direction) {
+                    case 'right':
+                        if (currentColumn === 'todo') targetColumn = 'doing';
+                        else if (currentColumn === 'doing') targetColumn = 'done';
+                        break;
+                    case 'left':
+                        if (currentColumn === 'doing') targetColumn = 'todo';
+                        else if (currentColumn === 'done') targetColumn = 'doing';
+                        break;
+                }
+                
+                if (targetColumn) {
+                    this.moveTask(this.selectedTaskId, currentColumn, targetColumn);
+                }
+            }
+
+            resetRitualChecklist() {
+                // Reset all checklist items to uncompleted
+                this.ritualChecklist.forEach(item => item.completed = false);
+                this.customRitualItems.forEach(item => item.completed = false);
+                this.currentSessionIntention = '';
+            }
+
+            renderRitualChecklist() {
+                const container = document.getElementById('ritualChecklistItems');
+                container.innerHTML = '';
+
+                // Combine default and custom items
+                const allItems = [...this.ritualChecklist, ...this.customRitualItems];
+
+                allItems.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = `checklist-item ${item.completed ? 'completed' : ''}`;
+                    itemElement.setAttribute('data-item-id', item.id);
+                    itemElement.setAttribute('data-is-custom', !item.isDefault);
+                    itemElement.setAttribute('draggable', 'true');
+
+                    itemElement.innerHTML = `
+                        <div class="item-checkbox"></div>
+                        <div class="item-text">${item.text}</div>
+                        <button class="item-delete">✕</button>
+                        <div class="drag-handle">⋮⋮</div>
+                    `;
+
+                    // Add click listener for checkbox
+                    itemElement.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('item-delete')) {
+                            this.deleteRitualItem(item.id, !item.isDefault);
+                            return;
+                        }
+                        if (e.target.classList.contains('drag-handle')) {
+                            return; // Don't toggle when clicking drag handle
+                        }
+                        this.toggleRitualItem(item.id, !item.isDefault);
+                    });
+
+                    // Add drag listeners
+                    this.setupRitualItemDragListeners(itemElement);
+
+                    container.appendChild(itemElement);
+                });
+            }
+
+            toggleRitualItem(itemId, isCustom) {
+                const items = isCustom ? this.customRitualItems : this.ritualChecklist;
+                const item = items.find(i => i.id === itemId);
+                if (item) {
+                    item.completed = !item.completed;
+                    this.renderRitualChecklist();
+                }
+            }
+
+            addCustomRitualItem() {
+                const text = prompt('Enter custom ritual item:', '🎵 Music playlist ready');
+                if (text && text.trim()) {
+                    const newItem = {
+                        id: Date.now(),
+                        text: text.trim(),
+                        isDefault: false,
+                        completed: false
+                    };
+                    this.customRitualItems.push(newItem);
+                    this.saveToStorage();
+                    this.renderRitualChecklist();
+                }
+            }
+
+            deleteRitualItem(itemId, isCustom) {
+                if (isCustom) {
+                    this.customRitualItems = this.customRitualItems.filter(item => item.id !== itemId);
+                } else {
+                    // For default items, just reset them instead of deleting
+                    const item = this.ritualChecklist.find(item => item.id === itemId);
+                    if (item) {
+                        item.completed = false;
+                    }
+                }
+                this.saveToStorage();
+                this.renderRitualChecklist();
+            }
+
+            deleteCustomRitualItem(itemId) {
+                this.deleteRitualItem(itemId, true);
+            }
+
+            setupRitualItemDragListeners(element) {
+                element.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', element.dataset.itemId);
+                    element.classList.add('dragging');
+                });
+
+                element.addEventListener('dragend', () => {
+                    element.classList.remove('dragging');
+                });
+
+                element.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+
+                element.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+                    const targetId = parseInt(element.dataset.itemId);
+                    
+                    if (draggedId !== targetId) {
+                        this.reorderRitualItems(draggedId, targetId);
+                    }
+                });
+            }
+
+            reorderRitualItems(draggedId, targetId) {
+                // Find dragged item in both arrays
+                let draggedItem = null;
+                let draggedIsCustom = false;
+                
+                // Check if it's a custom item
+                draggedItem = this.customRitualItems.find(item => item.id === draggedId);
+                if (draggedItem) {
+                    draggedIsCustom = true;
+                } else {
+                    // Check if it's a default item
+                    draggedItem = this.ritualChecklist.find(item => item.id === draggedId);
+                    draggedIsCustom = false;
+                }
+                
+                if (!draggedItem) return;
+                
+                // Find target item
+                let targetItem = null;
+                let targetIsCustom = false;
+                let targetIndex = -1;
+                
+                // Check custom items first
+                targetIndex = this.customRitualItems.findIndex(item => item.id === targetId);
+                if (targetIndex !== -1) {
+                    targetItem = this.customRitualItems[targetIndex];
+                    targetIsCustom = true;
+                } else {
+                    // Check default items
+                    targetIndex = this.ritualChecklist.findIndex(item => item.id === targetId);
+                    if (targetIndex !== -1) {
+                        targetItem = this.ritualChecklist[targetIndex];
+                        targetIsCustom = false;
+                    }
+                }
+                
+                if (!targetItem) return;
+                
+                // Only allow reordering within custom items for now
+                if (draggedIsCustom && targetIsCustom) {
+                    // Remove from current position
+                    this.customRitualItems = this.customRitualItems.filter(item => item.id !== draggedId);
+                    
+                    // Find new target index after removal
+                    const newTargetIndex = this.customRitualItems.findIndex(item => item.id === targetId);
+                    
+                    // Insert at new position
+                    this.customRitualItems.splice(newTargetIndex, 0, draggedItem);
+                    
+                    this.saveToStorage();
+                    this.renderRitualChecklist();
+                }
+            }
+
+            skipRitual() {
+                document.getElementById('preFocusRitual').style.display = 'none';
+                this.startActualFocusMode();
+            }
+
+            completeRitual() {
+                // Save session intention
+                this.currentSessionIntention = document.getElementById('sessionIntention').value.trim();
+                
+                // Hide ritual screen
+                document.getElementById('preFocusRitual').style.display = 'none';
+                
+                // Start focus mode
+                this.startActualFocusMode();
             }
         }
 
